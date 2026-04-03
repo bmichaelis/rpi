@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timpanogos Soccer RPI</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+    .subtitle { color: #555; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f4f4f4; font-weight: 600; }
+    .number { text-align: right; font-variant-numeric: tabular-nums; }
+    .rpi-value { font-size: 1.1rem; font-weight: bold; }
+    .timestamp { font-size: 0.8rem; color: #888; margin-top: 1rem; }
+    .error { color: #c00; }
+    .loading { color: #888; }
+  </style>
+</head>
+<body>
+  <h1>Timpanogos Timberwolves — UHSAA RPI</h1>
+  <p class="subtitle">UHSAA Post-Season Ranking formula: RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)</p>
+  <div id="content"><p class="loading">Loading...</p></div>
+
+  <script>
+    async function load() {
+      const el = document.getElementById("content");
+      try {
+        const res = await fetch("/api/rpi");
+        if (!res.ok) {
+          el.innerHTML = `<p class="error">Not yet computed (${res.status}). Check back after the first cron run.</p>`;
+          return;
+        }
+        const d = await res.json();
+        el.innerHTML = `
+          <table>
+            <tr><th>Field</th><th class="number">Value</th></tr>
+            <tr><td>Team</td><td>${d.team}</td></tr>
+            <tr><td>Classification</td><td>${d.classification}</td></tr>
+            <tr><td>Record</td><td>${d.record}</td></tr>
+            <tr><td>Games counted</td><td class="number">${d.gamesCounted}</td></tr>
+            <tr><td>Opponents counted</td><td class="number">${d.opponentsCounted}</td></tr>
+            <tr><td>Opp-of-opp counted</td><td class="number">${d.oppOppCounted}</td></tr>
+            <tr><td>MWP (45%)</td><td class="number">${d.mwp.toFixed(4)}</td></tr>
+            <tr><td>OWP (45%)</td><td class="number">${d.owp.toFixed(4)}</td></tr>
+            <tr><td>OOWP (10%)</td><td class="number">${d.oowp.toFixed(4)}</td></tr>
+            <tr><td><strong>RPI</strong></td><td class="number rpi-value">${d.rpi.toFixed(4)}</td></tr>
+          </table>
+          <p class="timestamp">Computed: ${new Date(d.computedAt).toLocaleString()}</p>
+        `;
+      } catch (e) {
+        el.innerHTML = `<p class="error">Failed to load: ${e.message}</p>`;
+      }
+    }
+
+    load();
+    setInterval(load, 10 * 60 * 1000); // refresh every 10 minutes
+  </script>
+</body>
+</html>
