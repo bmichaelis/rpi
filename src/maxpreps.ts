@@ -59,6 +59,7 @@ export async function getSchedule(
   const url = `${BASE_URL}/${teamSlug}/soccer/${season}/schedule/`;
   let data: unknown;
   try {
+    console.log(`Fetching: ${url}`);
     const res = await fetch(url, { headers: PAGE_HEADERS });
     console.log(`Schedule fetch ${teamSlug}: HTTP ${res.status}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
