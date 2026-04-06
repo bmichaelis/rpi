@@ -74,17 +74,15 @@ export async function getClassTeamSlugs(
     const listData = pageProps.rankingsListData as Record<string, unknown> | undefined;
     const teams = (listData?.rankings ?? []) as unknown[];
 
-    if (page === 1) {
-      console.log(`totalCount: ${listData?.totalCount}, first entry: ${JSON.stringify(teams[0])}`);
-    }
+    const totalCount = (listData?.totalCount as number) ?? 0;
+
     for (const t of teams) {
       const team = t as Record<string, unknown>;
-      const teamUrl = (team.url ?? (team.team as Record<string, unknown>)?.url) as string | undefined;
+      const teamUrl = team.teamLink as string | undefined;
       if (teamUrl) allSlugs.add(urlToSlug(teamUrl));
     }
 
-    // Stop if this page had no teams or we've hit a reasonable page limit
-    if (teams.length === 0 || page >= 20) break;
+    if (teams.length === 0 || allSlugs.size >= totalCount) break;
     page++;
   }
 
