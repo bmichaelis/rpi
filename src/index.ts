@@ -9,7 +9,12 @@ export default {
       if (!payload) {
         return new Response("RPI not yet computed", { status: 503 });
       }
-      return Response.json(payload.result, {
+      const team = url.searchParams.get("team");
+      const data = team ? payload.results[team] ?? null : payload.results;
+      if (data === null) {
+        return new Response("Team not found", { status: 404 });
+      }
+      return Response.json(data, {
         headers: { "Access-Control-Allow-Origin": "*" },
       });
     }

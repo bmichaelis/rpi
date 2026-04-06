@@ -26,7 +26,7 @@ export interface RpiResult {
 }
 
 export interface KVPayload {
-  result: RpiResult;
+  results: Record<string, RpiResult>;
   scheduleCache: Record<string, TeamSchedule>;
 }
 

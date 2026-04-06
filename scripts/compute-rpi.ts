@@ -1,6 +1,6 @@
 import { getBuildId, getSchedule, fetchBatch } from "../src/maxpreps";
 import { calculateRpi } from "../src/rpi";
-import type { KVPayload, TeamSchedule } from "../src/types";
+import type { KVPayload, RpiResult, TeamSchedule } from "../src/types";
 
 const {
   CLOUDFLARE_API_TOKEN,
@@ -92,10 +92,29 @@ async function main() {
   const freshL3 = await fetchBatch(staleL3, buildId, SEASON!);
   Object.assign(scheduleCache, freshL3);
 
-  const result = calculateRpi(TEAM_SLUG!, myClass, scheduleCache);
-  console.log(`RPI: ${result.rpi} (MWP=${result.mwp}, OWP=${result.owp}, OOWP=${result.oowp})`);
+  const results: Record<string, RpiResult> = {};
 
-  const payload: KVPayload = { result, scheduleCache };
+  // Our team
+  const myResult = calculateRpi(TEAM_SLUG!, myClass, scheduleCache);
+  results[TEAM_SLUG!] = myResult;
+  console.log(`RPI ${TEAM_SLUG}: ${myResult.rpi} (MWP=${myResult.mwp}, OWP=${myResult.owp}, OOWP=${myResult.oowp})`);
+
+  // All opponents
+  for (const oppSlug of oppSlugs) {
+    const opp = scheduleCache[oppSlug];
+    if (!opp) continue;
+    try {
+      const oppResult = calculateRpi(oppSlug, opp.classification, scheduleCache);
+      results[oppSlug] = oppResult;
+      console.log(`RPI ${oppSlug}: ${oppResult.rpi}`);
+    } catch (e) {
+      console.warn(`Could not calculate RPI for ${oppSlug}: ${e}`);
+    }
+  }
+
+  console.log(`Computed RPI for ${Object.keys(results).length} teams`);
+
+  const payload: KVPayload = { results, scheduleCache };
   await kvPut("payload", payload);
   console.log("Saved to KV");
 }

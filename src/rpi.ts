@@ -56,7 +56,7 @@ export function calcMwp(
 
 export function calculateRpi(
   mySlug: string,
-  myClassification: number,
+  myClassification: number | "oos",
   allSchedules: Record<string, TeamSchedule>
 ): RpiResult {
   const mySchedule = allSchedules[mySlug];
@@ -130,7 +130,7 @@ export function calculateRpi(
 
   return {
     team: mySlug,
-    classification: `${myClassification}A`,
+    classification: myClassification === "oos" ? "OOS" : `${myClassification}A`,
     record,
     gamesCounted: l1Games.length,
     opponentsCounted: uniqueOppSlugs.length,
