@@ -80,9 +80,9 @@ async function main() {
   scheduleCache[TEAM_SLUG!] = { ...mySchedule, fetchedAt: new Date().toISOString() };
   console.log(`Our schedule: ${mySchedule.games.length} completed games`);
 
-  const oppSlugs = [...new Set(mySchedule.games.map((g) => g.opponentSlug))];
+  const oppSlugs = mySchedule.allOpponentSlugs;
   const staleL2 = oppSlugs.filter((s) => isStale(scheduleCache[s], 12));
-  console.log(`Fetching ${staleL2.length} of ${oppSlugs.length} opponent schedules (Level 2)`);
+  console.log(`Fetching ${staleL2.length} of ${oppSlugs.length} opponent schedules (Level 2, played + unplayed)`);
   const freshL2 = await fetchBatch(staleL2, buildId, SEASON!);
   Object.assign(scheduleCache, freshL2);
 

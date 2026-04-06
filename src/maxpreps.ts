@@ -53,7 +53,7 @@ export async function getSchedule(
   teamSlug: string,
   buildId: string,
   season: string
-): Promise<{ games: Game[]; classification: number | "oos" }> {
+): Promise<{ games: Game[]; allOpponentSlugs: string[]; classification: number | "oos" }> {
   const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${season}/schedule.json`;
   let pageProps: Record<string, unknown>;
   try {
@@ -64,7 +64,7 @@ export async function getSchedule(
     pageProps = (data.pageProps as Record<string, unknown>) ?? {};
   } catch (e) {
     console.warn(`Could not fetch schedule for ${teamSlug}: ${e}`);
-    return { games: [], classification: "oos" };
+    return { games: [], allOpponentSlugs: [], classification: "oos" };
   }
 
   const classification = getClassification(pageProps);
@@ -73,6 +73,8 @@ export async function getSchedule(
   const contests = (pageProps.contests as unknown[][][]) ?? [];
 
   const games: Game[] = [];
+  const allOpponentSlugs = new Set<string>();
+
   for (const week of contests) {
     for (const game of week) {
       if (!game) continue;
@@ -95,8 +97,12 @@ export async function getSchedule(
         continue;
       }
 
+      const opponentSlug = urlToSlug((oppTeam[C_URL] as string) ?? "");
+      const opponentName = (oppTeam[C_NAME] as string) ?? "";
+      if (opponentSlug) allOpponentSlugs.add(opponentSlug);
+
       const result = ourTeam[C_RESULT] as string | null | undefined;
-      if (!result) continue; // unplayed
+      if (!result) continue; // unplayed — slug collected above, no game entry
 
       let won: boolean | null;
       if (result === "W") won = true;
@@ -104,15 +110,12 @@ export async function getSchedule(
       else if (result === "T") won = null;
       else continue; // unrecognised
 
-      const opponentSlug = urlToSlug((oppTeam[C_URL] as string) ?? "");
-      const opponentName = (oppTeam[C_NAME] as string) ?? "";
-
       games.push({ opponentSlug, opponentName, won });
     }
   }
 
-  console.log(`Games found for ${teamSlug}: ${games.length}`);
-  return { games, classification };
+  console.log(`Games found for ${teamSlug}: ${games.length} played, ${allOpponentSlugs.size} total opponents`);
+  return { games, allOpponentSlugs: [...allOpponentSlugs], classification };
 }
 
 export async function fetchBatch(
