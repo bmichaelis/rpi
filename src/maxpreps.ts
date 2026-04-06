@@ -71,7 +71,9 @@ export async function getSchedule(
 
   const classification = getClassification(data);
   const pageProps = getPageProps(data);
+  console.log(`pageProps keys: ${Object.keys(pageProps).join(", ")}`);
   const rawLinkedData = pageProps?.linkedDataJson;
+  console.log(`linkedDataJson type: ${typeof rawLinkedData}, snippet: ${JSON.stringify(rawLinkedData)?.slice(0, 300)}`);
   const linkedDataJson: Record<string, unknown> =
     typeof rawLinkedData === "string"
       ? (JSON.parse(rawLinkedData) as Record<string, unknown>)
@@ -87,6 +89,7 @@ export async function getSchedule(
     try {
       won = parseResult((e.description as string) ?? "");
     } catch {
+      console.log(`Skipping unplayed: ${(e.description as string)?.slice(0, 80) ?? "(none)"}`);
       continue; // unplayed game
     }
 
