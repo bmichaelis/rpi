@@ -1,4 +1,4 @@
-import { getSchedule, fetchBatch } from "../src/maxpreps";
+import { getBuildId, getSchedule, fetchBatch } from "../src/maxpreps";
 import { calculateRpi } from "../src/rpi";
 import type { KVPayload, TeamSchedule } from "../src/types";
 
@@ -70,23 +70,26 @@ async function main() {
 
   console.log(`Running RPI computation for ${TEAM_SLUG} (${myClass}A)`);
 
+  const buildId = await getBuildId();
+  console.log(`Build ID: ${buildId}`);
+
   const existing = await kvGet("payload") as KVPayload | null;
   const scheduleCache: Record<string, TeamSchedule> = existing?.scheduleCache ?? {};
 
-  const mySchedule = await getSchedule(TEAM_SLUG!, SEASON!);
+  const mySchedule = await getSchedule(TEAM_SLUG!, buildId, SEASON!);
   scheduleCache[TEAM_SLUG!] = { ...mySchedule, fetchedAt: new Date().toISOString() };
   console.log(`Our schedule: ${mySchedule.games.length} completed games`);
 
   const oppSlugs = [...new Set(mySchedule.games.map((g) => g.opponentSlug))];
   const staleL2 = oppSlugs.filter((s) => isStale(scheduleCache[s], 12));
   console.log(`Fetching ${staleL2.length} of ${oppSlugs.length} opponent schedules (Level 2)`);
-  const freshL2 = await fetchBatch(staleL2, SEASON!);
+  const freshL2 = await fetchBatch(staleL2, buildId, SEASON!);
   Object.assign(scheduleCache, freshL2);
 
   const oopSlugs = getOppOppSlugs(mySchedule.games, scheduleCache, TEAM_SLUG!);
   const staleL3 = oopSlugs.filter((s) => isStale(scheduleCache[s], 48));
   console.log(`Fetching ${staleL3.length} of ${oopSlugs.length} opp-of-opp schedules (Level 3)`);
-  const freshL3 = await fetchBatch(staleL3, SEASON!);
+  const freshL3 = await fetchBatch(staleL3, buildId, SEASON!);
   Object.assign(scheduleCache, freshL3);
 
   const result = calculateRpi(TEAM_SLUG!, myClass, scheduleCache);

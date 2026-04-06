@@ -2,13 +2,15 @@ import { parse } from "node-html-parser";
 import type { Game, TeamSchedule } from "./types";
 
 const BASE_URL = "https://www.maxpreps.com";
-const PAGE_HEADERS = {
+const HEADERS = {
   "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  Accept: "*/*",
   "Accept-Language": "en-US,en;q=0.9",
-  "Cache-Control": "no-cache",
-  "Upgrade-Insecure-Requests": "1",
+  "x-nextjs-data": "1",
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Site": "same-origin",
 };
 
 // Positions in each team entry within a contest tuple
@@ -22,17 +24,10 @@ function urlToSlug(fullUrl: string): string {
   return parts.length >= 3 ? parts.slice(0, 3).join("/") : path;
 }
 
-function getPageProps(data: unknown): Record<string, unknown> {
-  const d = data as Record<string, unknown>;
-  return (
-    ((d.props as Record<string, unknown>)?.pageProps as Record<string, unknown>) ?? {}
-  );
-}
-
-function getClassification(data: unknown): number | "oos" {
+function getClassification(pageProps: Record<string, unknown>): number | "oos" {
   try {
     const division = (
-      getPageProps(data)?.teamContext as Record<string, unknown>
+      pageProps?.teamContext as Record<string, unknown>
     )?.data as Record<string, unknown>;
     const name = (division?.stateDivisionName as string) ?? "";
     const m = name.match(/(\d)A/);
@@ -43,32 +38,36 @@ function getClassification(data: unknown): number | "oos" {
   return "oos";
 }
 
-function parseNextData(html: string): unknown {
+export async function getBuildId(): Promise<string> {
+  const res = await fetch(BASE_URL, { headers: { ...HEADERS, Accept: "text/html" } });
+  if (!res.ok) throw new Error(`MaxPreps homepage returned ${res.status}`);
+  const html = await res.text();
   const root = parse(html);
   const tag = root.querySelector("script#__NEXT_DATA__");
-  if (!tag) throw new Error("Could not find __NEXT_DATA__");
-  return JSON.parse(tag.text);
+  if (!tag) throw new Error("Could not find __NEXT_DATA__ on MaxPreps homepage");
+  const data = JSON.parse(tag.text);
+  return data.buildId.trim();
 }
 
 export async function getSchedule(
   teamSlug: string,
+  buildId: string,
   season: string
 ): Promise<{ games: Game[]; classification: number | "oos" }> {
-  const url = `${BASE_URL}/${teamSlug}/soccer/${season}/schedule/`;
-  let data: unknown;
+  const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${season}/schedule.json`;
+  let pageProps: Record<string, unknown>;
   try {
-    const res = await fetch(url, { headers: PAGE_HEADERS });
+    const res = await fetch(url, { headers: HEADERS });
     console.log(`Schedule fetch ${teamSlug}: HTTP ${res.status}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
-    data = parseNextData(html);
+    const data = await res.json() as Record<string, unknown>;
+    pageProps = (data.pageProps as Record<string, unknown>) ?? {};
   } catch (e) {
     console.warn(`Could not fetch schedule for ${teamSlug}: ${e}`);
     return { games: [], classification: "oos" };
   }
 
-  const classification = getClassification(data);
-  const pageProps = getPageProps(data);
+  const classification = getClassification(pageProps);
   // contests[week][game] = [team1_entry, team2_entry]
   // each team entry is a positional array
   const contests = (pageProps.contests as unknown[][][]) ?? [];
@@ -117,6 +116,7 @@ export async function getSchedule(
 
 export async function fetchBatch(
   slugs: string[],
+  buildId: string,
   season: string,
   concurrency = 8
 ): Promise<Record<string, TeamSchedule>> {
@@ -124,7 +124,7 @@ export async function fetchBatch(
   for (let i = 0; i < slugs.length; i += concurrency) {
     const chunk = slugs.slice(i, i + concurrency);
     const settled = await Promise.allSettled(
-      chunk.map((slug) => getSchedule(slug, season))
+      chunk.map((slug) => getSchedule(slug, buildId, season))
     );
     for (let j = 0; j < chunk.length; j++) {
       const s = settled[j];
