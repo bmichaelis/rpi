@@ -1,5 +1,10 @@
 import type { Game, RpiResult, TeamSchedule } from "./types";
 
+function slugToName(slug: string): string {
+  const last = slug.split("/").pop() ?? slug;
+  return last.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
 const GAME_VALUE: Record<number | "oos", number> = {
   2: 1.0,
   3: 1.0,
@@ -130,7 +135,7 @@ export function calculateRpi(
 
   return {
     team: mySlug,
-    teamName: mySchedule.teamName,
+    teamName: mySchedule.teamName || slugToName(mySlug),
     classification: myClassification === "oos" ? "OOS" : `${myClassification}A`,
     record,
     gamesCounted: l1Games.length,
