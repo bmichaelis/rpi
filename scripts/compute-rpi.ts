@@ -1,4 +1,4 @@
-import { getBuildId, getSchedule, fetchBatch } from "../src/maxpreps";
+import { getBuildId, getClassTeamSlugs, getSchedule, fetchBatch } from "../src/maxpreps";
 import { calculateRpi } from "../src/rpi";
 import type { KVPayload, RpiResult, TeamSchedule } from "../src/types";
 
@@ -9,6 +9,8 @@ const {
   TEAM_SLUG,
   TEAM_CLASS,
   SEASON,
+  CLASS_RANKINGS_SLUG,
+  STATE_DIVISION_ID,
 } = process.env;
 
 if (!CLOUDFLARE_API_TOKEN || !CLOUDFLARE_ACCOUNT_ID || !KV_NAMESPACE_ID || !TEAM_SLUG || !TEAM_CLASS || !SEASON) {
@@ -80,12 +82,26 @@ async function main() {
   scheduleCache[TEAM_SLUG!] = { ...mySchedule, fetchedAt: new Date().toISOString() };
   console.log(`Our schedule: ${mySchedule.games.length} completed games`);
 
+  // All opponents (played + scheduled)
   const oppSlugs = mySchedule.allOpponentSlugs;
-  const staleL2 = oppSlugs.filter((s) => isStale(scheduleCache[s], 12));
-  console.log(`Fetching ${staleL2.length} of ${oppSlugs.length} opponent schedules (Level 2, played + unplayed)`);
+
+  // All 4A class teams (superset of opponents)
+  let classSlugs: string[] = [];
+  if (CLASS_RANKINGS_SLUG && STATE_DIVISION_ID) {
+    classSlugs = await getClassTeamSlugs(CLASS_RANKINGS_SLUG, STATE_DIVISION_ID, buildId);
+  }
+
+  // Union of opponents and class teams (deduped), excluding our own slug
+  const allTargetSlugs = [...new Set([...oppSlugs, ...classSlugs])].filter(
+    (s) => s !== TEAM_SLUG
+  );
+
+  const staleL2 = allTargetSlugs.filter((s) => isStale(scheduleCache[s], 12));
+  console.log(`Fetching ${staleL2.length} of ${allTargetSlugs.length} target team schedules`);
   const freshL2 = await fetchBatch(staleL2, buildId, SEASON!);
   Object.assign(scheduleCache, freshL2);
 
+  // Opp-of-opp: all opponents of any target team
   const oopSlugs = getOppOppSlugs(mySchedule.games, scheduleCache, TEAM_SLUG!);
   const staleL3 = oopSlugs.filter((s) => isStale(scheduleCache[s], 48));
   console.log(`Fetching ${staleL3.length} of ${oopSlugs.length} opp-of-opp schedules (Level 3)`);
@@ -99,16 +115,16 @@ async function main() {
   results[TEAM_SLUG!] = myResult;
   console.log(`RPI ${TEAM_SLUG}: ${myResult.rpi} (MWP=${myResult.mwp}, OWP=${myResult.owp}, OOWP=${myResult.oowp})`);
 
-  // All opponents
-  for (const oppSlug of oppSlugs) {
-    const opp = scheduleCache[oppSlug];
-    if (!opp) continue;
+  // All target teams
+  for (const slug of allTargetSlugs) {
+    const team = scheduleCache[slug];
+    if (!team) continue;
     try {
-      const oppResult = calculateRpi(oppSlug, opp.classification, scheduleCache);
-      results[oppSlug] = oppResult;
-      console.log(`RPI ${oppSlug}: ${oppResult.rpi}`);
+      const r = calculateRpi(slug, team.classification, scheduleCache);
+      results[slug] = r;
+      console.log(`RPI ${slug}: ${r.rpi}`);
     } catch (e) {
-      console.warn(`Could not calculate RPI for ${oppSlug}: ${e}`);
+      console.warn(`Could not calculate RPI for ${slug}: ${e}`);
     }
   }
 

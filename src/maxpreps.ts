@@ -49,6 +49,51 @@ export async function getBuildId(): Promise<string> {
   return data.buildId.trim();
 }
 
+export async function getClassTeamSlugs(
+  rankingsSlug: string,
+  stateDivisionId: string,
+  buildId: string
+): Promise<string[]> {
+  const allSlugs = new Set<string>();
+  let page = 1;
+
+  while (true) {
+    const url = `${BASE_URL}/_next/data/${buildId}/${rankingsSlug}/${page}.json?statedivisionid=${stateDivisionId}`;
+    let pageProps: Record<string, unknown>;
+    try {
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json() as Record<string, unknown>;
+      pageProps = (data.pageProps as Record<string, unknown>) ?? {};
+    } catch (e) {
+      console.warn(`Could not fetch rankings page ${page}: ${e}`);
+      break;
+    }
+
+    // Log structure on first page so we can verify the path
+    if (page === 1) {
+      console.log(`Rankings pageProps keys: ${Object.keys(pageProps).join(", ")}`);
+      const snippet = JSON.stringify(pageProps.rankedTeams ?? pageProps.teams ?? pageProps.rankings)?.slice(0, 400);
+      console.log(`Rankings data snippet: ${snippet}`);
+    }
+
+    // Extract slugs from ranked teams
+    const teams = (pageProps.rankedTeams ?? pageProps.teams ?? []) as unknown[];
+    for (const t of teams) {
+      const team = t as Record<string, unknown>;
+      const teamUrl = (team.url ?? (team.team as Record<string, unknown>)?.url) as string | undefined;
+      if (teamUrl) allSlugs.add(urlToSlug(teamUrl));
+    }
+
+    // Stop if this page had no teams or we've hit a reasonable page limit
+    if (teams.length === 0 || page >= 20) break;
+    page++;
+  }
+
+  console.log(`Found ${allSlugs.size} teams in class rankings`);
+  return [...allSlugs];
+}
+
 export async function getSchedule(
   teamSlug: string,
   buildId: string,
