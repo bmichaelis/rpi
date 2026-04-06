@@ -130,6 +130,7 @@ export function calculateRpi(
 
   return {
     team: mySlug,
+    teamName: mySchedule.teamName,
     classification: myClassification === "oos" ? "OOS" : `${myClassification}A`,
     record,
     gamesCounted: l1Games.length,

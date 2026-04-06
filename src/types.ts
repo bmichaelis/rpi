@@ -7,11 +7,13 @@ export interface Game {
 export interface TeamSchedule {
   games: Game[];
   classification: number | "oos";
+  teamName: string;
   fetchedAt: string; // ISO timestamp
 }
 
 export interface RpiResult {
   team: string;
+  teamName: string;
   classification: string;
   record: string;
   gamesCounted: number;

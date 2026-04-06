@@ -94,7 +94,7 @@ export async function getSchedule(
   teamSlug: string,
   buildId: string,
   season: string
-): Promise<{ games: Game[]; allOpponentSlugs: string[]; classification: number | "oos" }> {
+): Promise<{ games: Game[]; allOpponentSlugs: string[]; teamName: string; classification: number | "oos" }> {
   const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${season}/schedule.json`;
   let pageProps: Record<string, unknown>;
   try {
@@ -105,7 +105,7 @@ export async function getSchedule(
     pageProps = (data.pageProps as Record<string, unknown>) ?? {};
   } catch (e) {
     console.warn(`Could not fetch schedule for ${teamSlug}: ${e}`);
-    return { games: [], allOpponentSlugs: [], classification: "oos" };
+    return { games: [], allOpponentSlugs: [], teamName: "", classification: "oos" };
   }
 
   const classification = getClassification(pageProps);
@@ -115,6 +115,7 @@ export async function getSchedule(
 
   const games: Game[] = [];
   const allOpponentSlugs = new Set<string>();
+  let teamName = "";
 
   for (const week of contests) {
     for (const game of week) {
@@ -138,6 +139,8 @@ export async function getSchedule(
         continue;
       }
 
+      if (!teamName) teamName = (ourTeam[C_NAME] as string) ?? "";
+
       const opponentSlug = urlToSlug((oppTeam[C_URL] as string) ?? "");
       const opponentName = (oppTeam[C_NAME] as string) ?? "";
       if (opponentSlug) allOpponentSlugs.add(opponentSlug);
@@ -156,7 +159,7 @@ export async function getSchedule(
   }
 
   console.log(`Games found for ${teamSlug}: ${games.length} played, ${allOpponentSlugs.size} total opponents`);
-  return { games, allOpponentSlugs: [...allOpponentSlugs], classification };
+  return { games, allOpponentSlugs: [...allOpponentSlugs], teamName, classification };
 }
 
 export async function fetchBatch(
