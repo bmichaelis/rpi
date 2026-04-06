@@ -11,17 +11,15 @@ const PAGE_HEADERS = {
   "Upgrade-Insecure-Requests": "1",
 };
 
+// Positions in each team entry within a contest tuple
+const C_URL    = 13; // team schedule URL
+const C_NAME   = 14; // school short name
+const C_RESULT =  5; // "W", "L", "T", or null/missing for unplayed
+
 function urlToSlug(fullUrl: string): string {
   const path = fullUrl.replace(BASE_URL + "/", "").replace(/^\/|\/$/g, "");
   const parts = path.split("/");
   return parts.length >= 3 ? parts.slice(0, 3).join("/") : path;
-}
-
-function parseResult(description: string): boolean | null {
-  if (description.includes(" won ")) return true;
-  if (description.includes(" lost ")) return false;
-  if (description.includes(" tied ")) return null;
-  throw new Error("unplayed");
 }
 
 function getPageProps(data: unknown): Record<string, unknown> {
@@ -59,7 +57,6 @@ export async function getSchedule(
   const url = `${BASE_URL}/${teamSlug}/soccer/${season}/schedule/`;
   let data: unknown;
   try {
-    console.log(`Fetching: ${url}`);
     const res = await fetch(url, { headers: PAGE_HEADERS });
     console.log(`Schedule fetch ${teamSlug}: HTTP ${res.status}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -72,52 +69,49 @@ export async function getSchedule(
 
   const classification = getClassification(data);
   const pageProps = getPageProps(data);
-  console.log(`pageProps keys: ${Object.keys(pageProps).join(", ")}`);
-  console.log(`first contest entry: ${JSON.stringify((pageProps.contests as unknown[][][])?.[0]?.[0])?.slice(0, 2000)}`);
-  const rawLinkedData = pageProps?.linkedDataJson;
-  const linkedDataJson: Record<string, unknown> =
-    typeof rawLinkedData === "string"
-      ? (JSON.parse(rawLinkedData) as Record<string, unknown>)
-      : (rawLinkedData as Record<string, unknown>);
-  const events: unknown[] =
-    (linkedDataJson?.mainEntity as Record<string, unknown>)?.event as unknown[] ?? [];
-  console.log(`Events found for ${teamSlug}: ${events.length}`);
+  // contests[week][game] = [team1_entry, team2_entry]
+  // each team entry is a positional array
+  const contests = (pageProps.contests as unknown[][][]) ?? [];
 
   const games: Game[] = [];
-  for (const ev of events) {
-    const e = ev as Record<string, unknown>;
-    let won: boolean | null;
-    try {
-      won = parseResult((e.description as string) ?? "");
-    } catch {
-      console.log(`Skipping unplayed: ${(e.description as string)?.slice(0, 80) ?? "(none)"}`);
-      continue; // unplayed game
+  for (const week of contests) {
+    for (const game of week) {
+      const team1 = game[0] as unknown[];
+      const team2 = game[1] as unknown[];
+      if (!team1 || !team2) continue;
+
+      const slug1 = urlToSlug((team1[C_URL] as string) ?? "");
+      const slug2 = urlToSlug((team2[C_URL] as string) ?? "");
+
+      let ourTeam: unknown[];
+      let oppTeam: unknown[];
+      if (slug1 === teamSlug) {
+        ourTeam = team1;
+        oppTeam = team2;
+      } else if (slug2 === teamSlug) {
+        ourTeam = team2;
+        oppTeam = team1;
+      } else {
+        continue;
+      }
+
+      const result = ourTeam[C_RESULT] as string | null | undefined;
+      if (!result) continue; // unplayed
+
+      let won: boolean | null;
+      if (result === "W") won = true;
+      else if (result === "L") won = false;
+      else if (result === "T") won = null;
+      else continue; // unrecognised
+
+      const opponentSlug = urlToSlug((oppTeam[C_URL] as string) ?? "");
+      const opponentName = (oppTeam[C_NAME] as string) ?? "";
+
+      games.push({ opponentSlug, opponentName, won });
     }
-
-    const awayTeam = e.awayTeam as Record<string, string>;
-    const homeTeam = e.homeTeam as Record<string, string>;
-    const awaySlug = urlToSlug(awayTeam?.url ?? "");
-    const homeSlug = urlToSlug(homeTeam?.url ?? "");
-    const awayName = awayTeam?.name ?? "";
-    const homeName = homeTeam?.name ?? "";
-
-    let opponentSlug: string;
-    let opponentName: string;
-    let ourResult: boolean | null;
-
-    if (awaySlug === teamSlug) {
-      opponentSlug = homeSlug;
-      opponentName = homeName;
-      ourResult = won;
-    } else {
-      opponentSlug = awaySlug;
-      opponentName = awayName;
-      ourResult = won === null ? null : !won;
-    }
-
-    games.push({ opponentSlug, opponentName, won: ourResult });
   }
 
+  console.log(`Games found for ${teamSlug}: ${games.length}`);
   return { games, classification };
 }
 
