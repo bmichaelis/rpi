@@ -1,0 +1,29 @@
+name: Compute RPI
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # every 2 hours
+  workflow_dispatch:        # allow manual runs
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Compute and store RPI
+        run: npx tsx scripts/compute-rpi.ts
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          KV_NAMESPACE_ID: ca8e5ca3c01c45cb8ed25e297250ec4c
+          TEAM_SLUG: ut/orem/timpanogos-timberwolves
+          TEAM_CLASS: "4"
+          SEASON: spring

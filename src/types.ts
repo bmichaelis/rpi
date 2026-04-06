@@ -32,7 +32,4 @@ export interface KVPayload {
 
 export interface Env {
   MAXPREPS_RPI: KVNamespace;
-  TEAM_SLUG: string;
-  TEAM_CLASS: string;
-  SEASON: string;
 }
