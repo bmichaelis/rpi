@@ -24,11 +24,17 @@ function parseResult(description: string): boolean | null {
   throw new Error("unplayed");
 }
 
+function getPageProps(data: unknown): Record<string, unknown> {
+  const d = data as Record<string, unknown>;
+  return (
+    ((d.props as Record<string, unknown>)?.pageProps as Record<string, unknown>) ?? {}
+  );
+}
+
 function getClassification(data: unknown): number | "oos" {
   try {
-    const d = data as Record<string, unknown>;
     const division = (
-      (d.pageProps as Record<string, unknown>)?.teamContext as Record<string, unknown>
+      getPageProps(data)?.teamContext as Record<string, unknown>
     )?.data as Record<string, unknown>;
     const name = (division?.stateDivisionName as string) ?? "";
     const m = name.match(/(\d)A/);
@@ -53,7 +59,6 @@ export async function getSchedule(
   const url = `${BASE_URL}/${teamSlug}/soccer/${season}/schedule/`;
   let data: unknown;
   try {
-    console.log(`Fetching URL: ${url}`);
     const res = await fetch(url, { headers: PAGE_HEADERS });
     console.log(`Schedule fetch ${teamSlug}: HTTP ${res.status}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -65,14 +70,8 @@ export async function getSchedule(
   }
 
   const classification = getClassification(data);
-  const d = data as Record<string, unknown>;
-  console.log(`__NEXT_DATA__ top-level keys for ${teamSlug}: ${Object.keys(d).join(", ")}`);
-  const pageProps = d.pageProps as Record<string, unknown>;
-  console.log(`pageProps keys for ${teamSlug}: ${Object.keys(pageProps ?? {}).join(", ")}`);
-  const props = d.props as Record<string, unknown>;
-  console.log(`props keys for ${teamSlug}: ${Object.keys(props ?? {}).join(", ")}`);
+  const pageProps = getPageProps(data);
   const rawLinkedData = pageProps?.linkedDataJson;
-  console.log(`linkedDataJson type for ${teamSlug}: ${typeof rawLinkedData}, value snippet: ${JSON.stringify(rawLinkedData)?.slice(0, 200)}`);
   const linkedDataJson: Record<string, unknown> =
     typeof rawLinkedData === "string"
       ? (JSON.parse(rawLinkedData) as Record<string, unknown>)
