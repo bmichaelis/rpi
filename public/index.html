@@ -60,6 +60,35 @@
       white-space: nowrap;
     }
 
+    .filter-toggle {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .filter-toggle button {
+      padding: 0.2em 0.65em;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: none;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--sans);
+    }
+
+    .filter-toggle button + button {
+      border-left: 1px solid var(--border);
+    }
+
+    .filter-toggle button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
     /* ── Two-column body ─────────────────────────────────────── */
     .body {
       display: grid;
@@ -346,6 +375,10 @@
   <header>
     <h1>UHSAA Boys Soccer — 4A RPI Rankings</h1>
     <span class="subtitle">RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)</span>
+    <div class="filter-toggle">
+      <button id="btn-4a" class="active" onclick="setFilter('4A')">4A</button>
+      <button id="btn-all" onclick="setFilter('all')">All</button>
+    </div>
     <span class="computed" id="computed-at"></span>
   </header>
 
@@ -355,6 +388,15 @@
 
   <script>
     const OUR_SLUG = "ut/orem/timpanogos-timberwolves";
+    let allData = {};
+    let activeFilter = "4A";
+
+    function setFilter(f) {
+      activeFilter = f;
+      document.getElementById("btn-4a").classList.toggle("active", f === "4A");
+      document.getElementById("btn-all").classList.toggle("active", f === "all");
+      buildUI(allData);
+    }
 
     function fmt4(n) { return (+n).toFixed(4); }
     function esc(s) {
@@ -377,7 +419,10 @@
     let currentSlug = null;
 
     function buildUI(data) {
-      const teams = Object.values(data).sort((a, b) => b.rpi - a.rpi);
+      allData = data;
+      const teams = Object.values(data)
+        .filter(t => activeFilter === "all" || t.classification === activeFilter)
+        .sort((a, b) => b.rpi - a.rpi);
 
       document.getElementById("body").innerHTML = `
         <div class="list-panel">
@@ -504,7 +549,8 @@
         const data = await res.json();
         // Guard against legacy single-result shape
         const isMulti = data && typeof data === "object" && !("rpi" in data);
-        buildUI(isMulti ? data : { [data.team]: data });
+        allData = isMulti ? data : { [data.team]: data };
+        buildUI(allData);
       } catch (e) {
         document.getElementById("body").innerHTML =
           `<div class="full-msg error">Failed to load: ${esc(e.message)}</div>`;
