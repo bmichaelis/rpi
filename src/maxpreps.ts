@@ -71,13 +71,12 @@ export async function getClassTeamSlugs(
     }
 
     // Log structure on first page so we can verify the path
-    if (page === 1) {
-      console.log(`rankingsListData snippet: ${JSON.stringify(pageProps.rankingsListData)?.slice(0, 600)}`);
-      console.log(`initRankingsStoreData snippet: ${JSON.stringify(pageProps.initRankingsStoreData)?.slice(0, 600)}`);
-    }
+    const listData = pageProps.rankingsListData as Record<string, unknown> | undefined;
+    const teams = (listData?.rankings ?? []) as unknown[];
 
-    const listData = (pageProps.rankingsListData ?? pageProps.initRankingsStoreData) as Record<string, unknown> | undefined;
-    const teams = (listData?.teams ?? listData?.rankedTeams ?? listData?.rankings ?? []) as unknown[];
+    if (page === 1) {
+      console.log(`totalCount: ${listData?.totalCount}, first entry: ${JSON.stringify(teams[0])}`);
+    }
     for (const t of teams) {
       const team = t as Record<string, unknown>;
       const teamUrl = (team.url ?? (team.team as Record<string, unknown>)?.url) as string | undefined;
