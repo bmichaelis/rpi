@@ -1,4 +1,4 @@
-import { getBuildId, getClassTeamSlugs, getSchedule, fetchBatch } from "../src/maxpreps";
+import { getBuildId, getClassTeams, getSchedule, fetchBatch } from "../src/maxpreps";
 import { calculateRpi } from "../src/rpi";
 import type { KVPayload, RpiResult, TeamSchedule } from "../src/types";
 
@@ -86,12 +86,20 @@ async function main() {
   const oppSlugs = mySchedule.allOpponentSlugs;
 
   // All 4A class teams (superset of opponents)
-  let classSlugs: string[] = [];
+  let classTeams: Array<{ slug: string; teamName: string }> = [];
   if (CLASS_RANKINGS_SLUG && STATE_DIVISION_ID) {
-    classSlugs = await getClassTeamSlugs(CLASS_RANKINGS_SLUG, STATE_DIVISION_ID, buildId);
+    classTeams = await getClassTeams(CLASS_RANKINGS_SLUG, STATE_DIVISION_ID, buildId);
+  }
+
+  // Backfill teamName from rankings data into any cached schedule missing it
+  for (const { slug, teamName } of classTeams) {
+    if (scheduleCache[slug] && !scheduleCache[slug].teamName) {
+      scheduleCache[slug] = { ...scheduleCache[slug], teamName };
+    }
   }
 
   // Union of opponents and class teams (deduped), excluding our own slug
+  const classSlugs = classTeams.map((t) => t.slug);
   const allTargetSlugs = [...new Set([...oppSlugs, ...classSlugs])].filter(
     (s) => s !== TEAM_SLUG
   );

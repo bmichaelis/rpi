@@ -49,12 +49,12 @@ export async function getBuildId(): Promise<string> {
   return data.buildId.trim();
 }
 
-export async function getClassTeamSlugs(
+export async function getClassTeams(
   rankingsSlug: string,
   stateDivisionId: string,
   buildId: string
-): Promise<string[]> {
-  const allSlugs = new Set<string>();
+): Promise<Array<{ slug: string; teamName: string }>> {
+  const seen = new Map<string, string>(); // slug → teamName
   let page = 1;
 
   while (true) {
@@ -70,24 +70,23 @@ export async function getClassTeamSlugs(
       break;
     }
 
-    // Log structure on first page so we can verify the path
     const listData = pageProps.rankingsListData as Record<string, unknown> | undefined;
     const teams = (listData?.rankings ?? []) as unknown[];
-
     const totalCount = (listData?.totalCount as number) ?? 0;
 
     for (const t of teams) {
       const team = t as Record<string, unknown>;
       const teamUrl = team.teamLink as string | undefined;
-      if (teamUrl) allSlugs.add(urlToSlug(teamUrl));
+      const name = (team.schoolName as string) ?? "";
+      if (teamUrl) seen.set(urlToSlug(teamUrl), name);
     }
 
-    if (teams.length === 0 || allSlugs.size >= totalCount) break;
+    if (teams.length === 0 || seen.size >= totalCount) break;
     page++;
   }
 
-  console.log(`Found ${allSlugs.size} teams in class rankings`);
-  return [...allSlugs];
+  console.log(`Found ${seen.size} teams in class rankings`);
+  return [...seen.entries()].map(([slug, teamName]) => ({ slug, teamName }));
 }
 
 export async function getSchedule(
