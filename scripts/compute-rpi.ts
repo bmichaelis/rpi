@@ -16,7 +16,6 @@ if (!CLOUDFLARE_API_TOKEN || !CLOUDFLARE_ACCOUNT_ID || !KV_NAMESPACE_ID || !TEAM
   process.exit(1);
 }
 
-const myClass = parseInt(TEAM_CLASS, 10);
 const KV_BASE = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces/${KV_NAMESPACE_ID}`;
 const KV_HEADERS = {
   Authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`,
@@ -66,30 +65,39 @@ function getOppOppSlugs(
   return [...result];
 }
 
-console.log(`Running RPI computation for ${TEAM_SLUG} (${myClass}A)`);
+async function main() {
+  const myClass = parseInt(TEAM_CLASS!, 10);
 
-const existing = await kvGet("payload") as KVPayload | null;
-const scheduleCache: Record<string, TeamSchedule> = existing?.scheduleCache ?? {};
+  console.log(`Running RPI computation for ${TEAM_SLUG} (${myClass}A)`);
 
-const mySchedule = await getSchedule(TEAM_SLUG, SEASON);
-scheduleCache[TEAM_SLUG] = { ...mySchedule, fetchedAt: new Date().toISOString() };
-console.log(`Our schedule: ${mySchedule.games.length} completed games`);
+  const existing = await kvGet("payload") as KVPayload | null;
+  const scheduleCache: Record<string, TeamSchedule> = existing?.scheduleCache ?? {};
 
-const oppSlugs = [...new Set(mySchedule.games.map((g) => g.opponentSlug))];
-const staleL2 = oppSlugs.filter((s) => isStale(scheduleCache[s], 12));
-console.log(`Fetching ${staleL2.length} of ${oppSlugs.length} opponent schedules (Level 2)`);
-const freshL2 = await fetchBatch(staleL2, SEASON);
-Object.assign(scheduleCache, freshL2);
+  const mySchedule = await getSchedule(TEAM_SLUG!, SEASON!);
+  scheduleCache[TEAM_SLUG!] = { ...mySchedule, fetchedAt: new Date().toISOString() };
+  console.log(`Our schedule: ${mySchedule.games.length} completed games`);
 
-const oopSlugs = getOppOppSlugs(mySchedule.games, scheduleCache, TEAM_SLUG);
-const staleL3 = oopSlugs.filter((s) => isStale(scheduleCache[s], 48));
-console.log(`Fetching ${staleL3.length} of ${oopSlugs.length} opp-of-opp schedules (Level 3)`);
-const freshL3 = await fetchBatch(staleL3, SEASON);
-Object.assign(scheduleCache, freshL3);
+  const oppSlugs = [...new Set(mySchedule.games.map((g) => g.opponentSlug))];
+  const staleL2 = oppSlugs.filter((s) => isStale(scheduleCache[s], 12));
+  console.log(`Fetching ${staleL2.length} of ${oppSlugs.length} opponent schedules (Level 2)`);
+  const freshL2 = await fetchBatch(staleL2, SEASON!);
+  Object.assign(scheduleCache, freshL2);
 
-const result = calculateRpi(TEAM_SLUG, myClass, scheduleCache);
-console.log(`RPI: ${result.rpi} (MWP=${result.mwp}, OWP=${result.owp}, OOWP=${result.oowp})`);
+  const oopSlugs = getOppOppSlugs(mySchedule.games, scheduleCache, TEAM_SLUG!);
+  const staleL3 = oopSlugs.filter((s) => isStale(scheduleCache[s], 48));
+  console.log(`Fetching ${staleL3.length} of ${oopSlugs.length} opp-of-opp schedules (Level 3)`);
+  const freshL3 = await fetchBatch(staleL3, SEASON!);
+  Object.assign(scheduleCache, freshL3);
 
-const payload: KVPayload = { result, scheduleCache };
-await kvPut("payload", payload);
-console.log("Saved to KV");
+  const result = calculateRpi(TEAM_SLUG!, myClass, scheduleCache);
+  console.log(`RPI: ${result.rpi} (MWP=${result.mwp}, OWP=${result.owp}, OOWP=${result.oowp})`);
+
+  const payload: KVPayload = { result, scheduleCache };
+  await kvPut("payload", payload);
+  console.log("Saved to KV");
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
