@@ -75,6 +75,7 @@ export async function getSchedule(
   const games: Game[] = [];
   for (const week of contests) {
     for (const game of week) {
+      if (!game) continue;
       const team1 = game[0] as unknown[];
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
