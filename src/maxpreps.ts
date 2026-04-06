@@ -72,8 +72,8 @@ export async function getSchedule(
   const classification = getClassification(data);
   const pageProps = getPageProps(data);
   console.log(`pageProps keys: ${Object.keys(pageProps).join(", ")}`);
+  console.log(`contests snippet: ${JSON.stringify(pageProps.contests)?.slice(0, 500)}`);
   const rawLinkedData = pageProps?.linkedDataJson;
-  console.log(`linkedDataJson type: ${typeof rawLinkedData}, snippet: ${JSON.stringify(rawLinkedData)?.slice(0, 300)}`);
   const linkedDataJson: Record<string, unknown> =
     typeof rawLinkedData === "string"
       ? (JSON.parse(rawLinkedData) as Record<string, unknown>)
