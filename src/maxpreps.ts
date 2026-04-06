@@ -72,13 +72,12 @@ export async function getClassTeamSlugs(
 
     // Log structure on first page so we can verify the path
     if (page === 1) {
-      console.log(`Rankings pageProps keys: ${Object.keys(pageProps).join(", ")}`);
-      const snippet = JSON.stringify(pageProps.rankedTeams ?? pageProps.teams ?? pageProps.rankings)?.slice(0, 400);
-      console.log(`Rankings data snippet: ${snippet}`);
+      console.log(`rankingsListData snippet: ${JSON.stringify(pageProps.rankingsListData)?.slice(0, 600)}`);
+      console.log(`initRankingsStoreData snippet: ${JSON.stringify(pageProps.initRankingsStoreData)?.slice(0, 600)}`);
     }
 
-    // Extract slugs from ranked teams
-    const teams = (pageProps.rankedTeams ?? pageProps.teams ?? []) as unknown[];
+    const listData = (pageProps.rankingsListData ?? pageProps.initRankingsStoreData) as Record<string, unknown> | undefined;
+    const teams = (listData?.teams ?? listData?.rankedTeams ?? listData?.rankings ?? []) as unknown[];
     for (const t of teams) {
       const team = t as Record<string, unknown>;
       const teamUrl = (team.url ?? (team.team as Record<string, unknown>)?.url) as string | undefined;
