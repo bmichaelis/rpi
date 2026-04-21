@@ -121,6 +121,15 @@ export function calculateRpi(
 
   const rpi = Math.round((0.45 * mwp + 0.45 * owp + 0.1 * oowp) * 10000) / 10000;
 
+  // Scoring stats — from played games only (goalsScored !== null)
+  const scoredGames = l1Games.filter(g => g.goalsScored !== null);
+  const n = scoredGames.length;
+  const totalGF = scoredGames.reduce((sum, g) => sum + (g.goalsScored ?? 0), 0);
+  const totalGA = scoredGames.reduce((sum, g) => sum + (g.goalsAllowed ?? 0), 0);
+  const gpg  = n > 0 ? Math.round((totalGF / n) * 100) / 100 : 0;
+  const gapg = n > 0 ? Math.round((totalGA / n) * 100) / 100 : 0;
+  const gd   = n > 0 ? Math.round(((totalGF - totalGA) / n) * 100) / 100 : 0;
+
   // Count unique opp-of-opp teams
   const oppOppSlugs = new Set<string>();
   for (const oppSlug of uniqueOppSlugs) {
@@ -145,6 +154,9 @@ export function calculateRpi(
     owp: Math.round(owp * 10000) / 10000,
     oowp: Math.round(oowp * 10000) / 10000,
     rpi,
+    gpg,
+    gapg,
+    gd,
     computedAt: new Date().toISOString(),
     formula: "RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)",
   };
