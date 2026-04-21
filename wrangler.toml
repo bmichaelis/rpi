@@ -2,10 +2,14 @@ name = "soccer-rpi"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
+routes = [
+  { pattern = "rpi.kindacoach.com", custom_domain = true },
+  { pattern = "rpi.oremsoccer.com", custom_domain = true },
+]
+
 [assets]
 directory = "./public"
 
 [[kv_namespaces]]
 binding = "MAXPREPS_RPI"
 id = "ca8e5ca3c01c45cb8ed25e297250ec4c"          # replace after running: wrangler kv:namespace create RPI_CACHE
-

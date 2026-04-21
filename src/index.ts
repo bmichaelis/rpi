@@ -1,8 +1,21 @@
 import type { Env, KVPayload } from "./types";
 
+const FOCUS_SLUGS: Record<string, string> = {
+  "rpi.kindacoach.com": "ut/orem/timpanogos-timberwolves",
+  "rpi.oremsoccer.com": "ut/orem/orem-tigers",
+};
+const DEFAULT_FOCUS = "ut/orem/timpanogos-timberwolves";
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/config") {
+      const focusSlug = FOCUS_SLUGS[url.hostname] ?? DEFAULT_FOCUS;
+      return Response.json({ focusSlug }, {
+        headers: { "Access-Control-Allow-Origin": "*" },
+      });
+    }
 
     if (url.pathname === "/api/rpi") {
       const payload = await env.MAXPREPS_RPI.get("payload", "json") as KVPayload | null;
