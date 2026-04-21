@@ -17,6 +17,7 @@ const HEADERS = {
 const C_URL    = 13; // team schedule URL
 const C_NAME   = 14; // school short name
 const C_RESULT =  5; // "W", "L", "T", or null/missing for unplayed
+const C_SCORE  =  6; // goals scored by this team, null for unplayed
 
 function urlToSlug(fullUrl: string): string {
   const path = fullUrl.replace(BASE_URL + "/", "").replace(/^\/|\/$/g, "");
@@ -153,7 +154,13 @@ export async function getSchedule(
       else if (result === "T") won = null;
       else continue; // unrecognised
 
-      games.push({ opponentSlug, opponentName, won });
+      const goalsScored = typeof ourTeam[C_SCORE] === "number"
+        ? (ourTeam[C_SCORE] as number)
+        : null;
+      const goalsAllowed = typeof oppTeam[C_SCORE] === "number"
+        ? (oppTeam[C_SCORE] as number)
+        : null;
+      games.push({ opponentSlug, opponentName, won, goalsScored, goalsAllowed });
     }
   }
 
