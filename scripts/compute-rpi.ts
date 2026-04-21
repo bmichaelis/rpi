@@ -79,7 +79,8 @@ async function main() {
   const scheduleCache: Record<string, TeamSchedule> = existing?.scheduleCache ?? {};
 
   const mySchedule = await getSchedule(TEAM_SLUG!, buildId, SEASON!);
-  scheduleCache[TEAM_SLUG!] = { ...mySchedule, fetchedAt: new Date().toISOString() };
+  const { allOpponentSlugs: _a, ...myScheduleData } = mySchedule;
+  scheduleCache[TEAM_SLUG!] = { ...myScheduleData, fetchedAt: new Date().toISOString() };
   console.log(`Our schedule: ${mySchedule.games.length} completed games`);
 
   // All opponents (played + scheduled)
@@ -104,14 +105,14 @@ async function main() {
     (s) => s !== TEAM_SLUG
   );
 
-  const staleL2 = allTargetSlugs.filter((s) => isStale(scheduleCache[s], 12));
+  const staleL2 = allTargetSlugs.filter((s) => isStale(scheduleCache[s], 12) || !scheduleCache[s]?.upcoming);
   console.log(`Fetching ${staleL2.length} of ${allTargetSlugs.length} target team schedules`);
   const freshL2 = await fetchBatch(staleL2, buildId, SEASON!);
   Object.assign(scheduleCache, freshL2);
 
   // Opp-of-opp: all opponents of any target team
   const oopSlugs = getOppOppSlugs(mySchedule.games, scheduleCache, TEAM_SLUG!);
-  const staleL3 = oopSlugs.filter((s) => isStale(scheduleCache[s], 48));
+  const staleL3 = oopSlugs.filter((s) => isStale(scheduleCache[s], 48) || !scheduleCache[s]?.upcoming);
   console.log(`Fetching ${staleL3.length} of ${oopSlugs.length} opp-of-opp schedules (Level 3)`);
   const freshL3 = await fetchBatch(staleL3, buildId, SEASON!);
   Object.assign(scheduleCache, freshL3);
