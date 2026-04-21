@@ -499,6 +499,11 @@
         .filter(t => activeFilter === "all" || t.classification === activeFilter);
       teams.sort((a, b) => {
         const val = { rpi: t => t.rpi, gpg: t => t.gpg, gapg: t => t.gapg, gd: t => t.gd };
+        if (sortCol === "team") {
+          const na = (a.teamName ?? a.team).toLowerCase();
+          const nb = (b.teamName ?? b.team).toLowerCase();
+          return sortDir === "desc" ? nb.localeCompare(na) : na.localeCompare(nb);
+        }
         const fn = val[sortCol] ?? val.rpi;
         return sortDir === "desc" ? fn(b) - fn(a) : fn(a) - fn(b);
       });
@@ -508,7 +513,8 @@
           <div class="list-col-head">
             <span class="sortable${sortCol === "rpi" ? " sort-active" : ""}"
                   onclick="setSort('rpi')">RPI${sortArrow("rpi")}</span>
-            <span>Team</span>
+            <span class="sortable${sortCol === "team" ? " sort-active" : ""}"
+                  onclick="setSort('team')">Team${sortArrow("team")}</span>
             <span class="sortable${sortCol === "gpg" ? " sort-active" : ""}"
                   onclick="setSort('gpg')">GPG${sortArrow("gpg")}</span>
             <span class="sortable${sortCol === "gapg" ? " sort-active" : ""}"
