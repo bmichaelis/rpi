@@ -376,6 +376,14 @@
     .stat-label { color: var(--muted); }
     .stat-val { font-family: var(--mono); font-weight: 600; }
 
+    /* Scoring cells */
+    .scoring-cell {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+
+    .scoring-cell .cc-val { color: #15803d; }
+
     /* Formula */
     .formula {
       padding: 0.6rem 1.25rem;
@@ -611,6 +619,27 @@
           </div>
 
           <div class="section">
+            <div class="section-title">Scoring</div>
+            <div class="component-grid">
+              <div class="component-cell scoring-cell">
+                <div class="cc-label">GPG</div>
+                <div class="cc-val">${fmt2(team.gpg)}</div>
+                <div class="cc-weight">goals/game</div>
+              </div>
+              <div class="component-cell scoring-cell">
+                <div class="cc-label">GAPG</div>
+                <div class="cc-val">${fmt2(team.gapg)}</div>
+                <div class="cc-weight">allowed/game</div>
+              </div>
+              <div class="component-cell scoring-cell">
+                <div class="cc-label">GD/G</div>
+                <div class="cc-val">${fmtGd(team.gd)}</div>
+                <div class="cc-weight">differential</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
             <div class="section-title">Schedule Depth</div>
             <div class="stat-row">
               <span class="stat-label">Games counted</span>
@@ -625,8 +654,6 @@
               <span class="stat-val">${team.oppOppCounted}</span>
             </div>
           </div>
-
-          <div class="formula">${esc(team.formula)}</div>
         </div>
       `;
     }
