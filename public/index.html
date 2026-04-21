@@ -108,7 +108,7 @@
 
     .list-col-head {
       display: grid;
-      grid-template-columns: 1fr 3rem 3.2rem 3.6rem 4.5rem;
+      grid-template-columns: 1.5rem 1fr 3rem 3.2rem 3.6rem 4.5rem;
       gap: 0.25rem;
       padding: 0.45rem 0.75rem;
       font-size: 0.65rem;
@@ -123,7 +123,7 @@
     }
 
     .list-col-head span { text-align: right; }
-    .list-col-head span:nth-child(1) { text-align: left; }
+    .list-col-head span:nth-child(2) { text-align: left; }
 
     .list-col-head span.sortable {
       cursor: pointer;
@@ -138,7 +138,7 @@
 
     .team-row {
       display: grid;
-      grid-template-columns: 1fr 3rem 3.2rem 3.6rem 4.5rem;
+      grid-template-columns: 1.5rem 1fr 3rem 3.2rem 3.6rem 4.5rem;
       gap: 0.25rem;
       align-items: center;
       padding: 0.55rem 0.75rem;
@@ -519,6 +519,7 @@
       document.getElementById("body").innerHTML = `
         <div class="list-panel">
           <div class="list-col-head">
+            <span></span>
             <span class="sortable${sortCol === "team" ? " sort-active" : ""}"
                   onclick="setSort('team')">Team${sortArrow("team")}</span>
             <span class="sortable${sortCol === "gpg" ? " sort-active" : ""}"
@@ -538,12 +539,13 @@
       `;
 
       const listEl = document.getElementById("list-scroll");
-      teams.forEach((team) => {
+      teams.forEach((team, i) => {
         const isOurs = team.team === OUR_SLUG;
         const row = document.createElement("div");
         row.className = "team-row" + (isOurs ? " our-team" : "");
         row.dataset.slug = team.team;
         row.innerHTML = `
+          <span class="stat-cell" style="color:var(--muted);font-size:0.65rem">${i + 1}</span>
           <span class="team-name" title="${esc(team.teamName)}">
             <span class="rank-badge">#${team._rpiRank}</span>${esc(team.teamName)}<span class="record-inline">(${esc(team.record)})</span><span class="class-pill">${esc(team.classification)}</span>
           </span>
