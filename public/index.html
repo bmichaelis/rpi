@@ -465,10 +465,12 @@
 </head>
 <body>
   <header>
-    <h1>UHSAA Boys Soccer — 4A RPI Rankings</h1>
+    <h1>UHSAA Boys Soccer RPI Rankings</h1>
     <span class="subtitle">RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)</span>
     <div class="filter-toggle">
       <button id="btn-4a" class="active" onclick="setFilter('4A')">4A</button>
+      <button id="btn-5a" onclick="setFilter('5A')">5A</button>
+      <button id="btn-6a" onclick="setFilter('6A')">6A</button>
       <button id="btn-all" onclick="setFilter('all')">All</button>
     </div>
     <span class="computed" id="computed-at"></span>
@@ -488,6 +490,8 @@
     function setFilter(f) {
       activeFilter = f;
       document.getElementById("btn-4a").classList.toggle("active", f === "4A");
+      document.getElementById("btn-5a").classList.toggle("active", f === "5A");
+      document.getElementById("btn-6a").classList.toggle("active", f === "6A");
       document.getElementById("btn-all").classList.toggle("active", f === "all");
       buildUI(allData);
     }
