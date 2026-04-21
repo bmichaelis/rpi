@@ -2,6 +2,8 @@ export interface Game {
   opponentSlug: string;
   opponentName: string;
   won: boolean | null; // null = tie
+  goalsScored: number | null;  // ourTeam[6], null if unplayed
+  goalsAllowed: number | null; // oppTeam[6], null if unplayed
 }
 
 export interface TeamSchedule {
@@ -23,6 +25,9 @@ export interface RpiResult {
   owp: number;
   oowp: number;
   rpi: number;
+  gpg: number;
+  gapg: number;
+  gd: number;
   computedAt: string;
   formula: string;
 }
