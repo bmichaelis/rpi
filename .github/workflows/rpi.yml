@@ -28,6 +28,4 @@ jobs:
           KV_NAMESPACE_ID: ca8e5ca3c01c45cb8ed25e297250ec4c
           TEAM_SLUG: ut/orem/timpanogos-timberwolves
           TEAM_CLASS: "4"
-          SEASON: spring
-          CLASS_RANKINGS_SLUG: ut/soccer/spring/25-26/class/class-4a/rankings
-          STATE_DIVISION_ID: c534b3e8-c200-4b4b-9aa6-f5aa1e5352bc
+          SEASON: spring/25-26
