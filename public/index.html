@@ -532,13 +532,13 @@
     function buildUI(data) {
       allData = data;
 
-      // Assign fixed RPI ranks before any filtering/sorting
+      // Assign RPI ranks within the active filter
       const allByRpi = Object.values(data).sort((a, b) => b.rpi - a.rpi);
-      allByRpi.forEach((t, i) => { t._rpiRank = i + 1; });
+      const filtered = allByRpi.filter(t => activeFilter === "all" || t.classification === activeFilter);
+      filtered.forEach((t, i) => { t._rpiRank = i + 1; });
 
-      // Filter then sort by active column
-      const teams = allByRpi
-        .filter(t => activeFilter === "all" || t.classification === activeFilter);
+      // Sort by active column
+      const teams = [...filtered];
       teams.sort((a, b) => {
         const val = { rpi: t => t.rpi, gpg: t => t.gpg, gapg: t => t.gapg, gd: t => t.gd };
         if (sortCol === "team") {
