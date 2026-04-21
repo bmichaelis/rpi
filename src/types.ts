@@ -8,6 +8,7 @@ export interface Game {
 
 export interface TeamSchedule {
   games: Game[];
+  upcoming: { opponentSlug: string; opponentName: string }[];
   classification: number | "oos";
   teamName: string;
   fetchedAt: string; // ISO timestamp

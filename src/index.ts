@@ -17,6 +17,16 @@ export default {
       });
     }
 
+    if (url.pathname === "/api/schedule") {
+      const payload = await env.MAXPREPS_RPI.get("payload", "json") as KVPayload | null;
+      if (!payload) return new Response("Not ready", { status: 503 });
+      const team = url.searchParams.get("team");
+      if (!team) return new Response("team param required", { status: 400 });
+      const sched = payload.scheduleCache[team] ?? null;
+      if (!sched) return new Response("Team not found", { status: 404 });
+      return Response.json(sched, { headers: { "Access-Control-Allow-Origin": "*" } });
+    }
+
     if (url.pathname === "/api/rpi") {
       const payload = await env.MAXPREPS_RPI.get("payload", "json") as KVPayload | null;
       if (!payload) {

@@ -94,7 +94,7 @@ export async function getSchedule(
   teamSlug: string,
   buildId: string,
   season: string
-): Promise<{ games: Game[]; allOpponentSlugs: string[]; teamName: string; classification: number | "oos" }> {
+): Promise<{ games: Game[]; upcoming: { opponentSlug: string; opponentName: string }[]; allOpponentSlugs: string[]; teamName: string; classification: number | "oos" }> {
   const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${season}/schedule.json`;
   let pageProps: Record<string, unknown>;
   try {
@@ -105,7 +105,7 @@ export async function getSchedule(
     pageProps = (data.pageProps as Record<string, unknown>) ?? {};
   } catch (e) {
     console.warn(`Could not fetch schedule for ${teamSlug}: ${e}`);
-    return { games: [], allOpponentSlugs: [], teamName: "", classification: "oos" };
+    return { games: [], upcoming: [], allOpponentSlugs: [], teamName: "", classification: "oos" };
   }
 
   const classification = getClassification(pageProps);
@@ -114,6 +114,7 @@ export async function getSchedule(
   const contests = (pageProps.contests as unknown[][][]) ?? [];
 
   const games: Game[] = [];
+  const upcoming: { opponentSlug: string; opponentName: string }[] = [];
   const allOpponentSlugs = new Set<string>();
   let teamName = "";
 
@@ -146,7 +147,10 @@ export async function getSchedule(
       if (opponentSlug) allOpponentSlugs.add(opponentSlug);
 
       const result = ourTeam[C_RESULT] as string | null | undefined;
-      if (!result) continue; // unplayed — slug collected above, no game entry
+      if (!result) {
+        if (opponentSlug) upcoming.push({ opponentSlug, opponentName });
+        continue;
+      }
 
       let won: boolean | null;
       if (result === "W") won = true;
@@ -164,8 +168,8 @@ export async function getSchedule(
     }
   }
 
-  console.log(`Games found for ${teamSlug}: ${games.length} played, ${allOpponentSlugs.size} total opponents`);
-  return { games, allOpponentSlugs: [...allOpponentSlugs], teamName, classification };
+  console.log(`Games found for ${teamSlug}: ${games.length} played, ${upcoming.length} upcoming, ${allOpponentSlugs.size} total opponents`);
+  return { games, upcoming, allOpponentSlugs: [...allOpponentSlugs], teamName, classification };
 }
 
 export async function fetchBatch(
@@ -183,7 +187,8 @@ export async function fetchBatch(
     for (let j = 0; j < chunk.length; j++) {
       const s = settled[j];
       if (s.status === "fulfilled") {
-        result[chunk[j]] = { ...s.value, fetchedAt: new Date().toISOString() };
+        const { allOpponentSlugs: _a, ...rest } = s.value;
+        result[chunk[j]] = { ...rest, fetchedAt: new Date().toISOString() };
       }
     }
     if (i + concurrency < slugs.length) {

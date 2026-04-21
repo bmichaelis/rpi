@@ -384,6 +384,40 @@
 
     .scoring-cell .cc-val { color: #15803d; }
 
+    /* Schedule list */
+    .sched-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 1.25rem;
+      font-size: 0.75rem;
+    }
+
+    .sched-badge {
+      flex-shrink: 0;
+      width: 1.4rem;
+      text-align: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      border-radius: 3px;
+      padding: 0.1em 0;
+    }
+
+    .sched-badge.w { background: #dcfce7; color: #15803d; }
+    .sched-badge.l { background: #fee2e2; color: #b91c1c; }
+    .sched-badge.t { background: #f1f5f9; color: #64748b; }
+
+    .sched-score {
+      flex-shrink: 0;
+      width: 2.8rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text);
+    }
+
+    .sched-opp { color: var(--text); }
+    .sched-upcoming { color: var(--muted); font-style: italic; }
+
     /* Formula */
     .formula {
       padding: 0.6rem 1.25rem;
@@ -576,6 +610,41 @@
       const activeRow = document.querySelector(".team-row.active");
       if (activeRow) activeRow.scrollIntoView({ block: "nearest" });
       renderDetail(team);
+      fetchSchedule(team.team);
+    }
+
+    function fetchSchedule(slug) {
+      fetch(`/api/schedule?team=${encodeURIComponent(slug)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(sched => {
+          if (sched && currentSlug === slug) renderSchedule(sched);
+        });
+    }
+
+    function renderSchedule(sched) {
+      const el = document.getElementById("schedule-section");
+      if (!el) return;
+      const games = sched.games ?? [];
+      const upcoming = sched.upcoming ?? [];
+      const rows = [
+        ...games.map(g => {
+          const badge = g.won === true ? "W" : g.won === false ? "L" : "T";
+          const cls = g.won === true ? "w" : g.won === false ? "l" : "t";
+          const score = (g.goalsScored ?? "?") + "–" + (g.goalsAllowed ?? "?");
+          return `<div class="sched-row">
+            <span class="sched-badge ${cls}">${badge}</span>
+            <span class="sched-score">${score}</span>
+            <span class="sched-opp">${esc(g.opponentName || g.opponentSlug)}</span>
+          </div>`;
+        }),
+        ...upcoming.map(u => `<div class="sched-row">
+          <span class="sched-badge" style="width:1.4rem"></span>
+          <span class="sched-score"></span>
+          <span class="sched-upcoming">vs ${esc(u.opponentName || u.opponentSlug)}</span>
+        </div>`),
+      ];
+      el.innerHTML = `<div class="section-title">Schedule</div>` +
+        (rows.length ? rows.join("") : `<div class="sched-row" style="color:var(--muted)">No data</div>`);
     }
 
     function renderDetail(team) {
@@ -655,6 +724,11 @@
               <span class="stat-label">Opp-of-opp counted</span>
               <span class="stat-val">${team.oppOppCounted}</span>
             </div>
+          </div>
+
+          <div class="section" id="schedule-section">
+            <div class="section-title">Schedule</div>
+            <div class="sched-row" style="color:var(--muted)">Loading…</div>
           </div>
         </div>
       `;
