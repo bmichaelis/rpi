@@ -14,6 +14,7 @@ const HEADERS = {
 };
 
 // Positions in each team entry within a contest tuple
+const C_DELETED =  9; // true when this game is cancelled/deleted
 const C_URL    = 13; // team schedule URL
 const C_NAME   = 14; // school short name
 const C_RESULT =  5; // "W", "L", "T", or null/missing for unplayed
@@ -131,6 +132,7 @@ export async function getSchedule(
       const team1 = game[0] as unknown[];
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
+      if (team1[C_DELETED] || team2[C_DELETED]) continue;
 
       const slug1 = urlToSlug((team1[C_URL] as string) ?? "");
       const slug2 = urlToSlug((team2[C_URL] as string) ?? "");
@@ -155,10 +157,6 @@ export async function getSchedule(
 
       const result = ourTeam[C_RESULT] as string | null | undefined;
       if (!result) {
-        // Log full team entry for upcoming games so we can find the deletion flag
-        if (teamSlug === "ut/orem/timpanogos-timberwolves") {
-          console.log(`  upcoming vs ${opponentSlug}: [0..15]=${JSON.stringify(ourTeam.slice(0, 16))} [16..31]=${JSON.stringify(ourTeam.slice(16))}`);
-        }
         if (opponentSlug) upcoming.push({ opponentSlug, opponentName });
         continue;
       }
