@@ -153,14 +153,12 @@ export async function getSchedule(
       const opponentName = (oppTeam[C_NAME] as string) ?? "";
       if (opponentSlug) allOpponentSlugs.add(opponentSlug);
 
-      // Log the full metadata array (everything after the two team entries) for every game
-      // so we can identify which index holds the deletion flag.
-      if (teamSlug === "ut/orem/timpanogos-timberwolves") {
-        console.log(`  game vs ${opponentSlug}: meta=${JSON.stringify(game.slice(2))}`);
-      }
-
       const result = ourTeam[C_RESULT] as string | null | undefined;
       if (!result) {
+        // Log full team entry for upcoming games so we can find the deletion flag
+        if (teamSlug === "ut/orem/timpanogos-timberwolves") {
+          console.log(`  upcoming vs ${opponentSlug}: ourTeam.len=${ourTeam.length} [0..8]=${JSON.stringify(ourTeam.slice(0, 9))}`);
+        }
         if (opponentSlug) upcoming.push({ opponentSlug, opponentName });
         continue;
       }
