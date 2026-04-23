@@ -93,24 +93,17 @@ export async function getClassTeams(
 
 export async function getSchedule(
   teamSlug: string,
+  buildId: string,
   season: string
 ): Promise<{ games: Game[]; upcoming: { opponentSlug: string; opponentName: string }[]; allOpponentSlugs: string[]; teamName: string; classification: number | "oos" }> {
-  // Fetch the HTML page directly so we get a live SSR render with full contest
-  // metadata (including deletion flags). The _next/data/ JSON endpoint serves a
-  // separately-cached response that can lag behind the rendered page by days.
-  const url = `${BASE_URL}/${teamSlug}/soccer/${season}/schedule/`;
+  const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${season}/schedule.json`;
   let pageProps: Record<string, unknown>;
   try {
-    const res = await fetch(url, { headers: { ...HEADERS, Accept: "text/html" } });
+    const res = await fetch(url, { headers: HEADERS });
     console.log(`Schedule fetch ${teamSlug}: HTTP ${res.status}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
-    const root = parse(html);
-    const tag = root.querySelector("script#__NEXT_DATA__");
-    if (!tag) throw new Error("Could not find __NEXT_DATA__");
-    const data = JSON.parse(tag.text) as Record<string, unknown>;
-    const props = (data.props as Record<string, unknown>) ?? {};
-    pageProps = (props.pageProps as Record<string, unknown>) ?? {};
+    const data = await res.json() as Record<string, unknown>;
+    pageProps = (data.pageProps as Record<string, unknown>) ?? {};
   } catch (e) {
     console.warn(`Could not fetch schedule for ${teamSlug}: ${e}`);
     return { games: [], upcoming: [], allOpponentSlugs: [], teamName: "", classification: "oos" };
@@ -183,6 +176,7 @@ export async function getSchedule(
 
 export async function fetchBatch(
   slugs: string[],
+  buildId: string,
   season: string,
   concurrency = 8
 ): Promise<Record<string, TeamSchedule>> {
@@ -190,7 +184,7 @@ export async function fetchBatch(
   for (let i = 0; i < slugs.length; i += concurrency) {
     const chunk = slugs.slice(i, i + concurrency);
     const settled = await Promise.allSettled(
-      chunk.map((slug) => getSchedule(slug, season))
+      chunk.map((slug) => getSchedule(slug, buildId, season))
     );
     for (let j = 0; j < chunk.length; j++) {
       const s = settled[j];
