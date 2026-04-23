@@ -157,7 +157,7 @@ export async function getSchedule(
       if (!result) {
         // Log full team entry for upcoming games so we can find the deletion flag
         if (teamSlug === "ut/orem/timpanogos-timberwolves") {
-          console.log(`  upcoming vs ${opponentSlug}: ourTeam.len=${ourTeam.length} [0..8]=${JSON.stringify(ourTeam.slice(0, 9))}`);
+          console.log(`  upcoming vs ${opponentSlug}: [0..15]=${JSON.stringify(ourTeam.slice(0, 16))} [16..31]=${JSON.stringify(ourTeam.slice(16))}`);
         }
         if (opponentSlug) upcoming.push({ opponentSlug, opponentName });
         continue;
