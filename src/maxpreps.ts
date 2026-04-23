@@ -122,7 +122,7 @@ export async function getSchedule(
   for (const week of contests) {
     for (const game of week) {
       if (!game) continue;
-      if (game[4] === true) continue; // ContestState is Deleted
+      if (game[4]) continue; // ContestState is Deleted (bool true or int 1)
       const team1 = game[0] as unknown[];
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
@@ -150,6 +150,7 @@ export async function getSchedule(
 
       const result = ourTeam[C_RESULT] as string | null | undefined;
       if (!result) {
+        console.log(`  upcoming: ${opponentSlug} (game[4]=${JSON.stringify(game[4])} game[5]=${JSON.stringify(game[5])})`);
         if (opponentSlug) upcoming.push({ opponentSlug, opponentName });
         continue;
       }
