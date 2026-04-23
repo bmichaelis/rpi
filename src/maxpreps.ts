@@ -128,7 +128,6 @@ export async function getSchedule(
   for (const week of contests) {
     for (const game of week) {
       if (!game) continue;
-      if (game[4]) continue; // ContestState is Deleted (bool true or int 1)
       const team1 = game[0] as unknown[];
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
@@ -153,6 +152,12 @@ export async function getSchedule(
       const opponentSlug = urlToSlug((oppTeam[C_URL] as string) ?? "");
       const opponentName = (oppTeam[C_NAME] as string) ?? "";
       if (opponentSlug) allOpponentSlugs.add(opponentSlug);
+
+      // Log the full metadata array (everything after the two team entries) for every game
+      // so we can identify which index holds the deletion flag.
+      if (teamSlug === "ut/orem/timpanogos-timberwolves") {
+        console.log(`  game vs ${opponentSlug}: meta=${JSON.stringify(game.slice(2))}`);
+      }
 
       const result = ourTeam[C_RESULT] as string | null | undefined;
       if (!result) {
