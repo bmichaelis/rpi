@@ -121,6 +121,7 @@ export async function getSchedule(
   for (const week of contests) {
     for (const game of week) {
       if (!game) continue;
+      if (game[4] === true) continue; // ContestState is Deleted
       const team1 = game[0] as unknown[];
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
