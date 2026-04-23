@@ -108,7 +108,8 @@ export async function getSchedule(
     const tag = root.querySelector("script#__NEXT_DATA__");
     if (!tag) throw new Error("Could not find __NEXT_DATA__");
     const data = JSON.parse(tag.text) as Record<string, unknown>;
-    pageProps = (data.pageProps as Record<string, unknown>) ?? {};
+    const props = (data.props as Record<string, unknown>) ?? {};
+    pageProps = (props.pageProps as Record<string, unknown>) ?? {};
   } catch (e) {
     console.warn(`Could not fetch schedule for ${teamSlug}: ${e}`);
     return { games: [], upcoming: [], allOpponentSlugs: [], teamName: "", classification: "oos" };
