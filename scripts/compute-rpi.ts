@@ -54,7 +54,9 @@ async function main() {
   const buildId = await getBuildId();
   console.log(`Build ID: ${buildId}`);
 
-  const existing = await kvGet("payload") as KVPayload | null;
+  const forceRefresh = process.env.FORCE_REFRESH === "true";
+  const existing = forceRefresh ? null : await kvGet("payload") as KVPayload | null;
+  if (forceRefresh) console.log("FORCE_REFRESH: ignoring schedule cache");
   const scheduleCache: Record<string, TeamSchedule> = existing?.scheduleCache ?? {};
 
   // Our team — always freshly fetched
