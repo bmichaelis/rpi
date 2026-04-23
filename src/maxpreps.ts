@@ -95,7 +95,8 @@ export async function getSchedule(
   buildId: string,
   season: string
 ): Promise<{ games: Game[]; upcoming: { opponentSlug: string; opponentName: string }[]; allOpponentSlugs: string[]; teamName: string; classification: number | "oos" }> {
-  const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${season}/schedule.json`;
+  const seasonBase = season.split('/')[0];
+  const url = `${BASE_URL}/_next/data/${buildId}/${teamSlug}/soccer/${seasonBase}/schedule.json`;
   let pageProps: Record<string, unknown>;
   try {
     const res = await fetch(url, { headers: HEADERS });
