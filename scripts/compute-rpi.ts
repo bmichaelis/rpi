@@ -74,12 +74,20 @@ async function main() {
   console.log(`Our schedule: ${mySchedule.games.length} completed games`);
 
   // Fetch all class teams (4A + 5A + 6A)
+  // SLUG_LIST_FILE overrides rankings pages (useful when historical rankings 404)
   const classTeamMap = new Map<string, string>(); // slug → teamName
-  for (const { cls, divisionId } of CLASS_CONFIGS) {
-    const rankingsSlug = `ut/soccer/${SEASON}/class/class-${cls}a/rankings`;
-    const teams = await getClassTeams(rankingsSlug, divisionId, buildId);
-    for (const { slug, teamName } of teams) classTeamMap.set(slug, teamName);
-    console.log(`Found ${teams.length} ${cls}A teams`);
+  const slugListFile = process.env.SLUG_LIST_FILE;
+  if (slugListFile) {
+    const slugs: string[] = JSON.parse(readFileSync(slugListFile, "utf8"));
+    for (const slug of slugs) classTeamMap.set(slug, "");
+    console.log(`Loaded ${slugs.length} team slugs from ${slugListFile}`);
+  } else {
+    for (const { cls, divisionId } of CLASS_CONFIGS) {
+      const rankingsSlug = `ut/soccer/${SEASON}/class/class-${cls}a/rankings`;
+      const teams = await getClassTeams(rankingsSlug, divisionId, buildId);
+      for (const { slug, teamName } of teams) classTeamMap.set(slug, teamName);
+      console.log(`Found ${teams.length} ${cls}A teams`);
+    }
   }
 
   // Backfill teamName into cached schedules missing it
