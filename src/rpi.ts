@@ -102,7 +102,8 @@ export function calculateRpi(
   }
   const owp = oppWps.length > 0 ? oppWps.reduce((a, b) => a + b, 0) / oppWps.length : 0;
 
-  // OOWP — for each unique opponent, average their opponents' plain WP per-game (excluding H2H vs common opp)
+  // OOWP — for each unique opponent, compute their per-game OWP (excluding H2H vs that opponent),
+  // then average across unique opponents
   const oowpPerOpp: number[] = [];
   for (const oppSlug of uniqueOppSlugs) {
     const opp = allSchedules[oppSlug];
