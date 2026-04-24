@@ -16,6 +16,13 @@ const GAME_VALUE: Record<number | "oos", number> = {
 const LOWER_CLASS_VALUES = new Set([2, 3]);
 const CROSS_CLASS_EXEMPTIONS = 3;
 
+function calcWp(games: Game[], excludeSlug?: string): number {
+  const played = games.filter(g => g.won !== undefined && (!excludeSlug || g.opponentSlug !== excludeSlug));
+  if (played.length === 0) return 0;
+  const wins = played.reduce((sum, g) => sum + (g.won === true ? 1 : g.won === null ? 0.5 : 0), 0);
+  return wins / played.length;
+}
+
 export function calcMwp(
   games: Game[],
   myClassification: number | "oos",
@@ -84,36 +91,31 @@ export function calculateRpi(
   // MWP
   const mwp = calcMwp(l1Games, myClassification, classifications);
 
-  // OWP — each opponent's MWP excluding H2H games vs us
+  // OWP — per-game weighted average of each opponent's plain WP (excluding H2H vs us)
+  // Opponents played multiple times contribute their WP once per game played
   const uniqueOppSlugs = [...new Set(l1Games.map((g) => g.opponentSlug))];
-  const oppMwps: number[] = [];
-  for (const slug of uniqueOppSlugs) {
-    const opp = allSchedules[slug];
+  const oppWps: number[] = [];
+  for (const game of l1Games) {
+    const opp = allSchedules[game.opponentSlug];
     if (!opp) continue;
-    const oppCls = opp.classification;
-    const effCls = typeof oppCls === "number" ? oppCls : myClassification;
-    oppMwps.push(calcMwp(opp.games, effCls, classifications, mySlug));
+    oppWps.push(calcWp(opp.games, mySlug));
   }
-  const owp = oppMwps.length > 0 ? oppMwps.reduce((a, b) => a + b, 0) / oppMwps.length : 0;
+  const owp = oppWps.length > 0 ? oppWps.reduce((a, b) => a + b, 0) / oppWps.length : 0;
 
-  // OOWP — for each opponent, average their opponents' MWP (excluding H2H vs the common opp)
+  // OOWP — for each unique opponent, average their opponents' plain WP per-game (excluding H2H vs common opp)
   const oowpPerOpp: number[] = [];
   for (const oppSlug of uniqueOppSlugs) {
     const opp = allSchedules[oppSlug];
     if (!opp) continue;
-    const ooSlugs = [
-      ...new Set(opp.games.map((g) => g.opponentSlug).filter((s) => s !== mySlug)),
-    ];
-    const ooMwps: number[] = [];
-    for (const ooSlug of ooSlugs) {
-      const oo = allSchedules[ooSlug];
+    const ooWps: number[] = [];
+    for (const oppGame of opp.games) {
+      if (oppGame.opponentSlug === mySlug) continue;
+      const oo = allSchedules[oppGame.opponentSlug];
       if (!oo) continue;
-      const ooCls = oo.classification;
-      const effCls = typeof ooCls === "number" ? ooCls : myClassification;
-      ooMwps.push(calcMwp(oo.games, effCls, classifications, oppSlug));
+      ooWps.push(calcWp(oo.games, oppSlug));
     }
-    if (ooMwps.length > 0) {
-      oowpPerOpp.push(ooMwps.reduce((a, b) => a + b, 0) / ooMwps.length);
+    if (ooWps.length > 0) {
+      oowpPerOpp.push(ooWps.reduce((a, b) => a + b, 0) / ooWps.length);
     }
   }
   const oowp =

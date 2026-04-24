@@ -89,6 +89,23 @@
       color: #fff;
     }
 
+    .year-select {
+      padding: 0.2em 0.5em;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-family: var(--sans);
+    }
+
+    .list-col-head.hist-grid,
+    .team-row.hist-grid {
+      grid-template-columns: 1.5rem 1fr 3.8rem 3.8rem 4.2rem 4.5rem;
+    }
+
     /* ── Two-column body ─────────────────────────────────────── */
     .body {
       display: grid;
@@ -467,6 +484,12 @@
   <header>
     <h1>UHSAA Boys Soccer RPI Rankings</h1>
     <span class="subtitle">RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)</span>
+    <select id="year-select" class="year-select" onchange="setYear(this.value)">
+      <option value="live">2025-26 (Live)</option>
+      <option value="2025">2024-25</option>
+      <option value="2024">2023-24</option>
+      <option value="2023">2022-23</option>
+    </select>
     <div class="filter-toggle">
       <button id="btn-4a" class="active" onclick="setFilter('4A')">4A</button>
       <button id="btn-5a" onclick="setFilter('5A')">5A</button>
@@ -486,6 +509,14 @@
     let activeFilter = "4A";
     let sortCol = "rpi";
     let sortDir = "desc";
+    let activeYear = "live";
+    let historicalPayload = null;
+
+    function isOurSchool(school) {
+      if (!OUR_SLUG) return false;
+      const slug = OUR_SLUG.split("/").pop() || "";
+      return slug.includes(school.toLowerCase().replace(/\s+/g, "-"));
+    }
 
     function setFilter(f) {
       activeFilter = f;
@@ -493,7 +524,8 @@
       document.getElementById("btn-5a").classList.toggle("active", f === "5A");
       document.getElementById("btn-6a").classList.toggle("active", f === "6A");
       document.getElementById("btn-all").classList.toggle("active", f === "all");
-      buildUI(allData);
+      if (activeYear === "live") buildUI(allData);
+      else if (historicalPayload) buildHistoricalUI(historicalPayload);
     }
 
     function setSort(col) {
@@ -503,7 +535,28 @@
         sortCol = col;
         sortDir = "desc";
       }
-      buildUI(allData);
+      if (activeYear === "live") buildUI(allData);
+      else if (historicalPayload) buildHistoricalUI(historicalPayload);
+    }
+
+    async function setYear(year) {
+      activeYear = year;
+      sortCol = "rpi";
+      sortDir = "desc";
+      if (year === "live") {
+        buildUI(allData);
+        return;
+      }
+      document.getElementById("body").innerHTML = `<div class="full-msg">Loading…</div>`;
+      try {
+        const res = await fetch(`/historical/${year}.json`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        historicalPayload = await res.json();
+        buildHistoricalUI(historicalPayload);
+      } catch (e) {
+        document.getElementById("body").innerHTML =
+          `<div class="full-msg error">Failed to load: ${esc(e.message)}</div>`;
+      }
     }
 
     function sortArrow(col) {
@@ -604,6 +657,138 @@
       } else if (teams.length) {
         selectTeam(teams[0]);
       }
+    }
+
+    function buildHistoricalUI(payload) {
+      const entries = [];
+      for (const cls of ["4A", "5A", "6A"]) {
+        for (const e of (payload.classes[cls] || [])) {
+          entries.push({ ...e, _class: cls });
+        }
+      }
+
+      const filtered = activeFilter === "all"
+        ? entries
+        : entries.filter(e => e._class === activeFilter);
+
+      const byRpi = [...filtered].sort((a, b) => b.rpi - a.rpi);
+      byRpi.forEach((e, i) => { e._rpiRank = i + 1; });
+
+      const sorted = [...byRpi];
+      if (sortCol === "school") {
+        sorted.sort((a, b) => {
+          const cmp = a.school.toLowerCase().localeCompare(b.school.toLowerCase());
+          return sortDir === "asc" ? cmp : -cmp;
+        });
+      } else {
+        const numField = { rpi: e => e.rpi, wp: e => e.wp, owp: e => e.owp, oowp: e => e.oowp };
+        const fn = numField[sortCol] ?? numField.rpi;
+        sorted.sort((a, b) => sortDir === "desc" ? fn(b) - fn(a) : fn(a) - fn(b));
+      }
+
+      document.getElementById("body").innerHTML = `
+        <div class="list-panel">
+          <div class="list-col-head hist-grid">
+            <span></span>
+            <span class="sortable${sortCol === "school" ? " sort-active" : ""}"
+                  onclick="setSort('school')">School${sortArrow("school")}</span>
+            <span class="sortable${sortCol === "wp" ? " sort-active" : ""}"
+                  onclick="setSort('wp')">WP${sortArrow("wp")}</span>
+            <span class="sortable${sortCol === "owp" ? " sort-active" : ""}"
+                  onclick="setSort('owp')">OWP${sortArrow("owp")}</span>
+            <span class="sortable${sortCol === "oowp" ? " sort-active" : ""}"
+                  onclick="setSort('oowp')">OOWP${sortArrow("oowp")}</span>
+            <span class="sortable${sortCol === "rpi" ? " sort-active" : ""}"
+                  onclick="setSort('rpi')">RPI${sortArrow("rpi")}</span>
+          </div>
+          <div class="list-scroll" id="list-scroll"></div>
+        </div>
+        <div class="detail-panel" id="detail-panel">
+          <div class="detail-empty">Select a school to see details.</div>
+        </div>
+      `;
+
+      document.getElementById("computed-at").textContent =
+        `UHSAA Official · ${payload.season}`;
+
+      const listEl = document.getElementById("list-scroll");
+      sorted.forEach((entry, i) => {
+        const isOurs = isOurSchool(entry.school);
+        const row = document.createElement("div");
+        row.className = "team-row hist-grid" + (isOurs ? " our-team" : "");
+        row.dataset.key = `${entry._class}:${entry.school}`;
+        row.innerHTML = `
+          <span class="stat-cell" style="color:var(--muted);font-size:0.65rem">${i + 1}</span>
+          <span class="team-name" title="${esc(entry.school)}">
+            <span class="rank-badge">#${entry._rpiRank}</span>${esc(entry.school)}<span class="record-inline">(${esc(entry.record)})</span><span class="class-pill">${entry._class}</span>
+          </span>
+          <span class="stat-cell">${fmt4(entry.wp)}</span>
+          <span class="stat-cell">${fmt4(entry.owp)}</span>
+          <span class="stat-cell">${fmt4(entry.oowp)}</span>
+          <span class="rpi-pill">${fmt4(entry.rpi)}</span>
+        `;
+        row.addEventListener("click", () => selectHistoricalEntry(entry));
+        listEl.appendChild(row);
+      });
+
+      const ourEntry = sorted.find(e => isOurSchool(e.school));
+      if (ourEntry) selectHistoricalEntry(ourEntry);
+      else if (sorted.length) selectHistoricalEntry(sorted[0]);
+    }
+
+    function selectHistoricalEntry(entry) {
+      const key = `${entry._class}:${entry.school}`;
+      document.querySelectorAll(".team-row").forEach(r => {
+        r.classList.toggle("active", r.dataset.key === key);
+      });
+      const activeRow = document.querySelector(".team-row.active");
+      if (activeRow) activeRow.scrollIntoView({ block: "nearest" });
+      renderHistoricalDetail(entry);
+    }
+
+    function renderHistoricalDetail(entry) {
+      const isOurs = isOurSchool(entry.school);
+      document.getElementById("detail-panel").innerHTML = `
+        <div class="detail-card">
+          <div class="card-head">
+            <div class="title">${esc(entry.school)}</div>
+            <div class="meta-row">
+              <span class="badge badge-class">${entry._class}</span>
+              <span class="record">${esc(entry.record)}</span>
+              <span class="badge badge-rank">Rank #${entry._rpiRank}</span>
+              ${isOurs ? '<span class="badge badge-ours">Our Team</span>' : ""}
+            </div>
+          </div>
+
+          <div class="rpi-hero">
+            <span class="rpi-big">${fmt4(entry.rpi)}</span>
+            <span class="rpi-label">RPI</span>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Component Breakdown</div>
+            <div class="component-grid">
+              <div class="component-cell">
+                <div class="cc-label">WP</div>
+                <div class="cc-val">${fmt4(entry.wp)}</div>
+                <div class="cc-weight">45% weight</div>
+              </div>
+              <div class="component-cell">
+                <div class="cc-label">OWP</div>
+                <div class="cc-val">${fmt4(entry.owp)}</div>
+                <div class="cc-weight">45% weight</div>
+              </div>
+              <div class="component-cell">
+                <div class="cc-label">OOWP</div>
+                <div class="cc-val">${fmt4(entry.oowp)}</div>
+                <div class="cc-weight">10% weight</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="formula">RPI = 0.45(WP) + 0.45(OWP) + 0.10(OOWP) · Source: UHSAA Official</div>
+        </div>
+      `;
     }
 
     function selectTeam(team) {
@@ -749,26 +934,30 @@
           OUR_SLUG = config.focusSlug ?? null;
         }
         if (!rpiRes.ok) {
-          const msg = rpiRes.status === 503
-            ? "RPI not yet computed — check back after the first scheduled run."
-            : `Server error (${rpiRes.status}).`;
-          document.getElementById("body").innerHTML =
-            `<div class="full-msg error">${esc(msg)}</div>`;
+          if (activeYear === "live") {
+            const msg = rpiRes.status === 503
+              ? "RPI not yet computed — check back after the first scheduled run."
+              : `Server error (${rpiRes.status}).`;
+            document.getElementById("body").innerHTML =
+              `<div class="full-msg error">${esc(msg)}</div>`;
+          }
           return;
         }
         const data = await rpiRes.json();
         // Guard against legacy single-result shape
         const isMulti = data && typeof data === "object" && !("rpi" in data);
         allData = isMulti ? data : { [data.team]: data };
-        buildUI(allData);
+        if (activeYear === "live") buildUI(allData);
       } catch (e) {
-        document.getElementById("body").innerHTML =
-          `<div class="full-msg error">Failed to load: ${esc(e.message)}</div>`;
+        if (activeYear === "live") {
+          document.getElementById("body").innerHTML =
+            `<div class="full-msg error">Failed to load: ${esc(e.message)}</div>`;
+        }
       }
     }
 
     load();
-    setInterval(load, 10 * 60 * 1000);
+    setInterval(() => { if (activeYear === "live") load(); }, 10 * 60 * 1000);
   </script>
 </body>
 </html>

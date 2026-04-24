@@ -1,6 +1,7 @@
 import { getBuildId, getClassTeams, getSchedule, fetchBatch } from "../src/maxpreps";
 import { calculateRpi } from "../src/rpi";
 import type { KVPayload, RpiResult, TeamSchedule } from "../src/types";
+import { writeFileSync, readFileSync, existsSync } from "fs";
 
 const {
   CLOUDFLARE_API_TOKEN,
@@ -11,8 +12,15 @@ const {
   SEASON,
 } = process.env;
 
-if (!CLOUDFLARE_API_TOKEN || !CLOUDFLARE_ACCOUNT_ID || !KV_NAMESPACE_ID || !TEAM_SLUG || !TEAM_CLASS || !SEASON) {
-  console.error("Missing required environment variables");
+const isVerifyMode = process.env.VERIFY === "true";
+const needsKv = !isVerifyMode || process.env.FORCE_REFRESH !== "true";
+
+if (!TEAM_SLUG || !TEAM_CLASS || !SEASON) {
+  console.error("Missing required environment variables: TEAM_SLUG, TEAM_CLASS, SEASON");
+  process.exit(1);
+}
+if (needsKv && (!CLOUDFLARE_API_TOKEN || !CLOUDFLARE_ACCOUNT_ID || !KV_NAMESPACE_ID)) {
+  console.error("Missing Cloudflare KV credentials (not needed when VERIFY=true FORCE_REFRESH=true)");
   process.exit(1);
 }
 
@@ -133,6 +141,50 @@ async function main() {
   }
 
   console.log(`Computed RPI for ${Object.keys(results).length} teams`);
+
+  // VERIFY mode: write to file and diff against UHSAA, skip KV write
+  if (process.env.VERIFY === "true") {
+    writeFileSync("verify-results.json", JSON.stringify(results, null, 2));
+    console.log("\nWrote verify-results.json");
+
+    const uhsaaYear = process.env.VERIFY_YEAR ?? "2025";
+    const uhsaaPath = `public/historical/${uhsaaYear}.json`;
+    if (!existsSync(uhsaaPath)) {
+      console.log(`No UHSAA data at ${uhsaaPath} — run fetch-historical.ts first`);
+      return;
+    }
+    const uhsaa = JSON.parse(readFileSync(uhsaaPath, "utf8"));
+    const uhsaaByName: Record<string, Record<string, unknown>> = {};
+    for (const [cls, entries] of Object.entries(uhsaa.classes) as [string, any[]][]) {
+      for (const e of entries) uhsaaByName[e.school.toLowerCase()] = { ...e, _class: cls };
+    }
+
+    console.log("\n─── UHSAA vs Our Calculation ───────────────────────────────────────");
+    console.log(
+      "School".padEnd(22) +
+      "Cls".padEnd(5) +
+      ["UHSAA WP","Our MWP","UHSAA OWP","Our OWP","UHSAA OOWP","Our OOWP","UHSAA RPI","Our RPI"]
+        .map(h => h.padStart(10)).join("")
+    );
+    console.log("─".repeat(22 + 5 + 80));
+
+    for (const result of Object.values(results).sort((a: any, b: any) => b.rpi - a.rpi)) {
+      const r = result as RpiResult;
+      const nameKey = r.teamName.toLowerCase();
+      const u = uhsaaByName[nameKey];
+      if (!u) continue;
+      const fmt = (n: number) => (typeof n === "number" ? n.toFixed(6) : "      —").padStart(10);
+      console.log(
+        r.teamName.padEnd(22) +
+        r.classification.padEnd(5) +
+        fmt(u.wp as number) + fmt(r.mwp) +
+        fmt(u.owp as number) + fmt(r.owp) +
+        fmt(u.oowp as number) + fmt(r.oowp) +
+        fmt(u.rpi as number) + fmt(r.rpi)
+      );
+    }
+    return;
+  }
 
   const payload: KVPayload = { results, scheduleCache };
   await kvPut("payload", payload);

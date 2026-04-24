@@ -14,11 +14,12 @@ const HEADERS = {
 };
 
 // Positions in each team entry within a contest tuple
-const C_DELETED =  9; // true when this game is cancelled/deleted
-const C_URL    = 13; // team schedule URL
-const C_NAME   = 14; // school short name
-const C_RESULT =  5; // "W", "L", "T", or null/missing for unplayed
-const C_SCORE  =  6; // goals scored by this team, null for unplayed
+const C_DELETED   =  9; // true when this game is cancelled/deleted
+const C_GAME_TYPE = 12; // 0/1 = regular season, 4 = post-season (playoffs)
+const C_URL       = 13; // team schedule URL
+const C_NAME      = 14; // school short name
+const C_RESULT    =  5; // "W", "L", "T", or null/missing for unplayed
+const C_SCORE     =  6; // goals scored by this team, null for unplayed
 
 function urlToSlug(fullUrl: string): string {
   const path = fullUrl.replace(BASE_URL + "/", "").replace(/^\/|\/$/g, "");
@@ -126,6 +127,7 @@ export async function getSchedule(
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
       if (team1[C_DELETED] || team2[C_DELETED]) continue;
+      if ((team1[C_GAME_TYPE] as number) === 4 || (team2[C_GAME_TYPE] as number) === 4) continue;
 
       const slug1 = urlToSlug((team1[C_URL] as string) ?? "");
       const slug2 = urlToSlug((team2[C_URL] as string) ?? "");

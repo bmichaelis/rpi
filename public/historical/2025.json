@@ -1,0 +1,753 @@
+{
+  "year": 2025,
+  "season": "2024-25",
+  "source": "UHSAA official",
+  "classes": {
+    "4A": [
+      {
+        "rank": 1,
+        "school": "Murray",
+        "schoolId": "cf0f9ae9-afa2-48f7-8fdd-dba8e341eb64",
+        "rpi": 0.699097,
+        "wp": 0.941176,
+        "owp": 0.499685,
+        "oowp": 0.507093,
+        "record": "16-1-0"
+      },
+      {
+        "rank": 2,
+        "school": "Dixie",
+        "schoolId": "45821c48-15b3-4de6-84bb-6b16c0528adc",
+        "rpi": 0.678073,
+        "wp": 0.866667,
+        "owp": 0.52642,
+        "oowp": 0.511842,
+        "record": "13-2-0"
+      },
+      {
+        "rank": 3,
+        "school": "Orem",
+        "schoolId": "6e96854a-3ca4-44bb-a6b0-899cf84dfa3d",
+        "rpi": 0.650884,
+        "wp": 0.8,
+        "owp": 0.525476,
+        "oowp": 0.544202,
+        "record": "12-3-0"
+      },
+      {
+        "rank": 4,
+        "school": "Crimson Cliffs",
+        "schoolId": "a306be62-9b50-4c8b-88eb-c9ca199e3653",
+        "rpi": 0.616888,
+        "wp": 0.8,
+        "owp": 0.455053,
+        "oowp": 0.52114,
+        "record": "12-3-0"
+      },
+      {
+        "rank": 5,
+        "school": "Green Canyon",
+        "schoolId": "320cb480-75fa-40fd-89a5-4e3c7d22ea4a",
+        "rpi": 0.608088,
+        "wp": 0.764706,
+        "owp": 0.472701,
+        "oowp": 0.512555,
+        "record": "13-4-0"
+      },
+      {
+        "rank": 6,
+        "school": "Ridgeline",
+        "schoolId": "195dd565-52ac-499a-8a51-6e5a6ca3b161",
+        "rpi": 0.607272,
+        "wp": 0.8,
+        "owp": 0.43746,
+        "oowp": 0.50415,
+        "record": "12-3-0"
+      },
+      {
+        "rank": 7,
+        "school": "Timpanogos",
+        "schoolId": "d1b51cea-e24a-4de9-aa09-1b7cbc7b4350",
+        "rpi": 0.606488,
+        "wp": 0.714286,
+        "owp": 0.511973,
+        "oowp": 0.546713,
+        "record": "10-4-0"
+      },
+      {
+        "rank": 8,
+        "school": "Mountain View",
+        "schoolId": "49119dd6-813f-4687-9de2-9367fb69139d",
+        "rpi": 0.599538,
+        "wp": 0.6875,
+        "owp": 0.524594,
+        "oowp": 0.540956,
+        "record": "11-5-0"
+      },
+      {
+        "rank": 9,
+        "school": "Provo",
+        "schoolId": "7abb78b4-7ace-4587-9417-8fab69f53108",
+        "rpi": 0.575787,
+        "wp": 0.5625,
+        "owp": 0.598068,
+        "oowp": 0.535314,
+        "record": "9-7-0"
+      },
+      {
+        "rank": 10,
+        "school": "Sky View",
+        "schoolId": "2539db01-fc21-44bd-8b98-1761f985564e",
+        "rpi": 0.57402,
+        "wp": 0.647059,
+        "owp": 0.515875,
+        "oowp": 0.506995,
+        "record": "11-6-0"
+      },
+      {
+        "rank": 11,
+        "school": "Snow Canyon",
+        "schoolId": "050bdd3d-fd8e-43be-aa25-5bcd08c1d57d",
+        "rpi": 0.559009,
+        "wp": 0.6,
+        "owp": 0.531453,
+        "oowp": 0.498547,
+        "record": "9-6-0"
+      },
+      {
+        "rank": 12,
+        "school": "Stansbury",
+        "schoolId": "37281a36-83d8-4a78-a024-ae8b06a8d8d5",
+        "rpi": 0.542823,
+        "wp": 0.588235,
+        "owp": 0.506195,
+        "oowp": 0.503299,
+        "record": "10-7-0"
+      },
+      {
+        "rank": 13,
+        "school": "Uintah",
+        "schoolId": "4cc6eb03-5d9e-4ac8-bdec-b489991b76c3",
+        "rpi": 0.517572,
+        "wp": 0.411765,
+        "owp": 0.623481,
+        "oowp": 0.517111,
+        "record": "7-10-0"
+      },
+      {
+        "rank": 14,
+        "school": "Park City",
+        "schoolId": "4659b500-3e03-47e9-82c1-d8001c50356f",
+        "rpi": 0.512799,
+        "wp": 0.470588,
+        "owp": 0.559842,
+        "oowp": 0.491057,
+        "record": "8-9-0"
+      },
+      {
+        "rank": 15,
+        "school": "Logan",
+        "schoolId": "9ed9325a-1730-4163-b9da-3ef02b66a7a3",
+        "rpi": 0.500406,
+        "wp": 0.411765,
+        "owp": 0.592704,
+        "oowp": 0.483955,
+        "record": "7-10-0"
+      },
+      {
+        "rank": 16,
+        "school": "Hillcrest",
+        "schoolId": "bd6dd782-0f19-4d70-9c3b-cfb6542b648a",
+        "rpi": 0.481531,
+        "wp": 0.470588,
+        "owp": 0.48862,
+        "oowp": 0.498874,
+        "record": "8-9-0"
+      },
+      {
+        "rank": 17,
+        "school": "Desert Hills",
+        "schoolId": "0a237b69-071a-46e8-aaf2-e16fbcdbe4bc",
+        "rpi": 0.46626,
+        "wp": 0.411765,
+        "owp": 0.512301,
+        "oowp": 0.504305,
+        "record": "7-10-0"
+      },
+      {
+        "rank": 18,
+        "school": "Tooele",
+        "schoolId": "768c0b0c-3976-4301-bcb3-bbed698f1e39",
+        "rpi": 0.462662,
+        "wp": 0.470588,
+        "owp": 0.446183,
+        "oowp": 0.501147,
+        "record": "8-9-0"
+      },
+      {
+        "rank": 19,
+        "school": "Mountain Crest",
+        "schoolId": "c724bdec-229c-4605-a31a-b24b846d79c9",
+        "rpi": 0.441566,
+        "wp": 0.375,
+        "owp": 0.498237,
+        "oowp": 0.486091,
+        "record": "6-10-0"
+      },
+      {
+        "rank": 20,
+        "school": "Payson",
+        "schoolId": "3093931d-d1f7-4c6f-90e5-452471761067",
+        "rpi": 0.417715,
+        "wp": 0.285714,
+        "owp": 0.52416,
+        "oowp": 0.532718,
+        "record": "4-10-0"
+      },
+      {
+        "rank": 21,
+        "school": "Pine View",
+        "schoolId": "0812b3e0-a3fe-4cc4-9aec-c610fa876a2d",
+        "rpi": 0.415165,
+        "wp": 0.357143,
+        "owp": 0.452649,
+        "oowp": 0.507585,
+        "record": "5-9-0"
+      },
+      {
+        "rank": 22,
+        "school": "Cedar",
+        "schoolId": "a8809a7a-1792-4e59-8115-46e6a69ebd8a",
+        "rpi": 0.391928,
+        "wp": 0.266667,
+        "owp": 0.4921,
+        "oowp": 0.504829,
+        "record": "4-11-0"
+      },
+      {
+        "rank": 23,
+        "school": "Bear River",
+        "schoolId": "89256834-140b-4795-b315-3d20fe7f7642",
+        "rpi": 0.35188,
+        "wp": 0.235294,
+        "owp": 0.436716,
+        "oowp": 0.494755,
+        "record": "4-13-0"
+      },
+      {
+        "rank": 24,
+        "school": "Cottonwood",
+        "schoolId": "08394de7-d692-4c13-9884-357aca49d37c",
+        "rpi": 0.343197,
+        "wp": 0.176471,
+        "owp": 0.476225,
+        "oowp": 0.494834,
+        "record": "3-14-0"
+      },
+      {
+        "rank": 25,
+        "school": "West Field",
+        "schoolId": "d7558027-ec85-4953-9b9b-f9438769331f",
+        "rpi": 0.320575,
+        "wp": 0.117647,
+        "owp": 0.48367,
+        "oowp": 0.49982,
+        "record": "2-15-0"
+      },
+      {
+        "rank": 26,
+        "school": "Hurricane",
+        "schoolId": "0a949fc1-1c71-4e38-8746-27391d49c2d8",
+        "rpi": 0.301495,
+        "wp": 0.0625,
+        "owp": 0.497985,
+        "oowp": 0.49277,
+        "record": "1-15-0"
+      },
+      {
+        "rank": 27,
+        "school": "Jordan",
+        "schoolId": "e6da4ee5-2996-4c78-8d7b-09946de1de96",
+        "rpi": 0.300167,
+        "wp": 0.058824,
+        "owp": 0.497794,
+        "oowp": 0.496886,
+        "record": "1-16-0"
+      }
+    ],
+    "5A": [
+      {
+        "rank": 1,
+        "school": "East",
+        "schoolId": "abf92ed8-5bdd-4f40-81be-0c8f39357cff",
+        "rpi": 0.695399,
+        "wp": 0.882353,
+        "owp": 0.541909,
+        "oowp": 0.544813,
+        "record": "15-2-0"
+      },
+      {
+        "rank": 2,
+        "school": "Alta",
+        "schoolId": "e6e9909c-fc6e-48f5-a192-2c440e70c239",
+        "rpi": 0.682247,
+        "wp": 0.875,
+        "owp": 0.515937,
+        "oowp": 0.563254,
+        "record": "14-2-0"
+      },
+      {
+        "rank": 3,
+        "school": "Bountiful",
+        "schoolId": "04519f82-93fb-400e-9fb8-cec111bfc8cd",
+        "rpi": 0.674262,
+        "wp": 0.941176,
+        "owp": 0.450498,
+        "oowp": 0.480083,
+        "record": "16-1-0"
+      },
+      {
+        "rank": 4,
+        "school": "Wasatch",
+        "schoolId": "fecc94a7-6a4c-45f6-9f53-3444835903ce",
+        "rpi": 0.662565,
+        "wp": 0.882353,
+        "owp": 0.475563,
+        "oowp": 0.51503,
+        "record": "15-2-0"
+      },
+      {
+        "rank": 5,
+        "school": "Granger",
+        "schoolId": "165c8bec-9854-4622-a9cd-60d0f37ab994",
+        "rpi": 0.629725,
+        "wp": 0.823529,
+        "owp": 0.469337,
+        "oowp": 0.479352,
+        "record": "14-3-0"
+      },
+      {
+        "rank": 6,
+        "school": "Skyline",
+        "schoolId": "22e57174-2c86-496c-99c9-b024b857cbe0",
+        "rpi": 0.599495,
+        "wp": 0.666667,
+        "owp": 0.545495,
+        "oowp": 0.540229,
+        "record": "10-5-0"
+      },
+      {
+        "rank": 7,
+        "school": "Spanish Fork",
+        "schoolId": "e6673388-704d-4112-94ab-cbbdf78c1b86",
+        "rpi": 0.584485,
+        "wp": 0.733333,
+        "owp": 0.455311,
+        "oowp": 0.495948,
+        "record": "11-4-0"
+      },
+      {
+        "rank": 8,
+        "school": "Viewmont",
+        "schoolId": "46247e26-1cf0-47cd-b71a-4d361a3c2d09",
+        "rpi": 0.553176,
+        "wp": 0.647059,
+        "owp": 0.476096,
+        "oowp": 0.477567,
+        "record": "11-6-0"
+      },
+      {
+        "rank": 9,
+        "school": "Northridge",
+        "schoolId": "6837a5f1-64de-4c88-8cca-21c8dfa69c81",
+        "rpi": 0.552911,
+        "wp": 0.666667,
+        "owp": 0.457167,
+        "oowp": 0.471861,
+        "record": "10-5-0"
+      },
+      {
+        "rank": 10,
+        "school": "Maple Mountain",
+        "schoolId": "0b88bcec-1db3-4d04-be72-90c85b6b9b02",
+        "rpi": 0.539336,
+        "wp": 0.5625,
+        "owp": 0.527438,
+        "oowp": 0.48864,
+        "record": "9-7-0"
+      },
+      {
+        "rank": 11,
+        "school": "Salem Hills",
+        "schoolId": "c699a1d2-906a-47f4-9b2b-73ff1f91e786",
+        "rpi": 0.525673,
+        "wp": 0.5625,
+        "owp": 0.495945,
+        "oowp": 0.493724,
+        "record": "9-7-0"
+      },
+      {
+        "rank": 12,
+        "school": "Kearns",
+        "schoolId": "49f827b6-a128-4f7c-9e4c-778e8cd81cab",
+        "rpi": 0.513337,
+        "wp": 0.647059,
+        "owp": 0.386064,
+        "oowp": 0.484318,
+        "record": "11-6-0"
+      },
+      {
+        "rank": 13,
+        "school": "West",
+        "schoolId": "c73551cf-b21b-4177-ba8b-734902a0a821",
+        "rpi": 0.503677,
+        "wp": 0.375,
+        "owp": 0.62587,
+        "oowp": 0.532859,
+        "record": "6-10-0"
+      },
+      {
+        "rank": 14,
+        "school": "Olympus",
+        "schoolId": "8fe978ec-f307-4ea5-8691-d09e185561fd",
+        "rpi": 0.484896,
+        "wp": 0.375,
+        "owp": 0.584017,
+        "oowp": 0.533378,
+        "record": "6-10-0"
+      },
+      {
+        "rank": 15,
+        "school": "Brighton",
+        "schoolId": "d23bba77-53db-43b2-910b-6275591953b9",
+        "rpi": 0.480094,
+        "wp": 0.4,
+        "owp": 0.548996,
+        "oowp": 0.530461,
+        "record": "6-9-0"
+      },
+      {
+        "rank": 16,
+        "school": "Roy",
+        "schoolId": "b1350e52-edfe-4180-aa66-b60135a68acc",
+        "rpi": 0.466883,
+        "wp": 0.470588,
+        "owp": 0.460184,
+        "oowp": 0.480356,
+        "record": "8-9-0"
+      },
+      {
+        "rank": 17,
+        "school": "Hunter",
+        "schoolId": "ee15b0c1-0390-48e1-8b7e-89cd9c34f5f7",
+        "rpi": 0.455395,
+        "wp": 0.375,
+        "owp": 0.533009,
+        "oowp": 0.467909,
+        "record": "6-10-0"
+      },
+      {
+        "rank": 18,
+        "school": "Taylorsville",
+        "schoolId": "7a31f317-e68d-401f-af08-25518f83c93c",
+        "rpi": 0.450008,
+        "wp": 0.411765,
+        "owp": 0.480494,
+        "oowp": 0.484922,
+        "record": "7-10-0"
+      },
+      {
+        "rank": 19,
+        "school": "Woods Cross",
+        "schoolId": "3a4eff00-6c55-44c3-a905-83db195a8381",
+        "rpi": 0.431561,
+        "wp": 0.4,
+        "owp": 0.452979,
+        "oowp": 0.4772,
+        "record": "6-9-0"
+      },
+      {
+        "rank": 20,
+        "school": "Cyprus",
+        "schoolId": "769546e6-a9f2-4c26-b3e0-aca12c0a7625",
+        "rpi": 0.40385,
+        "wp": 0.384615,
+        "owp": 0.405174,
+        "oowp": 0.484446,
+        "record": "5-8-0"
+      },
+      {
+        "rank": 21,
+        "school": "Timpview",
+        "schoolId": "437a38b3-0c25-4c4f-b8ee-4dd60c963490",
+        "rpi": 0.402222,
+        "wp": 0.266667,
+        "owp": 0.517509,
+        "oowp": 0.493427,
+        "record": "4-11-0"
+      },
+      {
+        "rank": 22,
+        "school": "West Jordan",
+        "schoolId": "9ec4fc24-e9f7-4c0b-ad40-89ce77b9ee2d",
+        "rpi": 0.376971,
+        "wp": 0.235294,
+        "owp": 0.497131,
+        "oowp": 0.473794,
+        "record": "4-13-0"
+      },
+      {
+        "rank": 23,
+        "school": "Clearfield",
+        "schoolId": "21fa3bb3-b2ad-4127-98c0-b6a18c1aacc0",
+        "rpi": 0.374426,
+        "wp": 0.266667,
+        "owp": 0.460635,
+        "oowp": 0.471399,
+        "record": "4-11-0"
+      },
+      {
+        "rank": 24,
+        "school": "Highland",
+        "schoolId": "8cd6b09f-1648-4fc5-aec6-64ca525fa27a",
+        "rpi": 0.372267,
+        "wp": 0.235294,
+        "owp": 0.47154,
+        "oowp": 0.541916,
+        "record": "4-13-0"
+      },
+      {
+        "rank": 25,
+        "school": "Cedar Valley",
+        "schoolId": "eb53555a-f7d5-456f-8f7b-b6b7eed38f90",
+        "rpi": 0.358164,
+        "wp": 0.214286,
+        "owp": 0.471049,
+        "oowp": 0.497638,
+        "record": "3-11-0"
+      },
+      {
+        "rank": 26,
+        "school": "Box Elder",
+        "schoolId": "4c6c20d1-925c-4d81-b558-885a957114e6",
+        "rpi": 0.33564,
+        "wp": 0.176471,
+        "owp": 0.46521,
+        "oowp": 0.468838,
+        "record": "3-14-0"
+      },
+      {
+        "rank": 27,
+        "school": "Bonneville",
+        "schoolId": "995b9103-b269-40d6-906c-aff5d387f8c7",
+        "rpi": 0.32427,
+        "wp": 0.125,
+        "owp": 0.491444,
+        "oowp": 0.468707,
+        "record": "2-14-0"
+      },
+      {
+        "rank": 28,
+        "school": "Springville",
+        "schoolId": "14e13b7e-53a1-4093-b645-3faf2e106315",
+        "rpi": 0.281161,
+        "wp": 0.058824,
+        "owp": 0.457636,
+        "oowp": 0.487544,
+        "record": "1-16-0"
+      }
+    ],
+    "6A": [
+      {
+        "rank": 1,
+        "school": "Lone Peak",
+        "schoolId": "e7badf59-379d-43cc-a875-938bdc607f2d",
+        "rpi": 0.729688,
+        "wp": 0.882353,
+        "owp": 0.610749,
+        "oowp": 0.577916,
+        "record": "15-2-0"
+      },
+      {
+        "rank": 2,
+        "school": "American Fork",
+        "schoolId": "b0fca8b1-c433-436c-abf6-5cc0dbddb4bd",
+        "rpi": 0.651879,
+        "wp": 0.714286,
+        "owp": 0.607823,
+        "oowp": 0.569296,
+        "record": "10-4-0"
+      },
+      {
+        "rank": 3,
+        "school": "Skyridge",
+        "schoolId": "4a0f0b57-1a90-4c1a-8738-5ed0bd61bf9d",
+        "rpi": 0.636172,
+        "wp": 0.705882,
+        "owp": 0.581022,
+        "oowp": 0.570649,
+        "record": "12-5-0"
+      },
+      {
+        "rank": 4,
+        "school": "Herriman",
+        "schoolId": "af2270c1-9bf4-4763-9100-19ad944724b5",
+        "rpi": 0.634005,
+        "wp": 0.75,
+        "owp": 0.542483,
+        "oowp": 0.523879,
+        "record": "12-4-0"
+      },
+      {
+        "rank": 5,
+        "school": "Davis",
+        "schoolId": "8d6766ba-a28c-4fcf-8e14-b6584224fd9b",
+        "rpi": 0.632788,
+        "wp": 0.666667,
+        "owp": 0.616106,
+        "oowp": 0.555398,
+        "record": "10-5-0"
+      },
+      {
+        "rank": 6,
+        "school": "Weber",
+        "schoolId": "9cfa8c84-05ad-435a-825a-eef0f0e14ec7",
+        "rpi": 0.624792,
+        "wp": 0.705882,
+        "owp": 0.558216,
+        "oowp": 0.559473,
+        "record": "12-5-0"
+      },
+      {
+        "rank": 7,
+        "school": "Fremont",
+        "schoolId": "df652754-1ae6-4553-bef3-21d1b8b8f86e",
+        "rpi": 0.618897,
+        "wp": 0.6875,
+        "owp": 0.559903,
+        "oowp": 0.575658,
+        "record": "11-5-0"
+      },
+      {
+        "rank": 8,
+        "school": "Riverton",
+        "schoolId": "10a14703-e4b0-4a41-8060-34272cd3bd1e",
+        "rpi": 0.611916,
+        "wp": 0.764706,
+        "owp": 0.476959,
+        "oowp": 0.531666,
+        "record": "13-4-0"
+      },
+      {
+        "rank": 9,
+        "school": "Salt Lake Academy",
+        "schoolId": "60fbb050-1b2d-40cb-8435-2bf84bded23c",
+        "rpi": 0.600367,
+        "wp": 0.692308,
+        "owp": 0.52419,
+        "oowp": 0.529429,
+        "record": "9-4-0"
+      },
+      {
+        "rank": 10,
+        "school": "Pleasant Grove",
+        "schoolId": "e44559a0-c28e-4272-b880-413ca3433ea9",
+        "rpi": 0.577335,
+        "wp": 0.588235,
+        "owp": 0.568213,
+        "oowp": 0.56933,
+        "record": "10-7-0"
+      },
+      {
+        "rank": 11,
+        "school": "Layton",
+        "schoolId": "d87f85c9-e648-4712-94a7-92e85c167da2",
+        "rpi": 0.549327,
+        "wp": 0.533333,
+        "owp": 0.563823,
+        "oowp": 0.556067,
+        "record": "8-7-0"
+      },
+      {
+        "rank": 12,
+        "school": "Farmington",
+        "schoolId": "66fa935b-15b2-4a0f-84a5-b442e2e1df0e",
+        "rpi": 0.549073,
+        "wp": 0.461538,
+        "owp": 0.635528,
+        "oowp": 0.553937,
+        "record": "6-7-0"
+      },
+      {
+        "rank": 13,
+        "school": "Bingham",
+        "schoolId": "367338c0-d784-492e-a854-c06cfc6447c1",
+        "rpi": 0.519041,
+        "wp": 0.5,
+        "owp": 0.536987,
+        "oowp": 0.523967,
+        "record": "7-7-0"
+      },
+      {
+        "rank": 14,
+        "school": "Syracuse",
+        "schoolId": "6bc90eb8-7c21-4902-8c0a-01dd5cd7586b",
+        "rpi": 0.501337,
+        "wp": 0.411765,
+        "owp": 0.573685,
+        "oowp": 0.578845,
+        "record": "7-10-0"
+      },
+      {
+        "rank": 15,
+        "school": "Lehi",
+        "schoolId": "510315b5-63cf-42d4-adb6-f5bea4c63bad",
+        "rpi": 0.49882,
+        "wp": 0.352941,
+        "owp": 0.631863,
+        "oowp": 0.556578,
+        "record": "6-11-0"
+      },
+      {
+        "rank": 16,
+        "school": "Corner Canyon",
+        "schoolId": "7e4dce6a-b7c1-4d9a-959c-892cd4b227df",
+        "rpi": 0.444733,
+        "wp": 0.375,
+        "owp": 0.494346,
+        "oowp": 0.535267,
+        "record": "6-10-0"
+      },
+      {
+        "rank": 17,
+        "school": "Westlake",
+        "schoolId": "0e595b87-49a2-45be-9d61-d6154986525b",
+        "rpi": 0.441076,
+        "wp": 0.294118,
+        "owp": 0.562629,
+        "oowp": 0.555396,
+        "record": "5-12-0"
+      },
+      {
+        "rank": 18,
+        "school": "Copper Hills",
+        "schoolId": "2f533e77-09c2-4363-8b72-3132147dac55",
+        "rpi": 0.437252,
+        "wp": 0.333333,
+        "owp": 0.520801,
+        "oowp": 0.528912,
+        "record": "5-10-0"
+      },
+      {
+        "rank": 19,
+        "school": "Mountain Ridge",
+        "schoolId": "63103896-a46c-47ce-8b5c-fe54c3aad494",
+        "rpi": 0.392293,
+        "wp": 0.176471,
+        "owp": 0.579203,
+        "oowp": 0.522405,
+        "record": "3-14-0"
+      }
+    ]
+  }
+}
