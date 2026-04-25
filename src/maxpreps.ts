@@ -56,8 +56,8 @@ export async function getClassTeams(
   rankingsSlug: string,
   stateDivisionId: string,
   buildId: string
-): Promise<Array<{ slug: string; teamName: string }>> {
-  const seen = new Map<string, string>(); // slug → teamName
+): Promise<Array<{ slug: string; teamName: string; mpOfficialRating?: number }>> {
+  const seen = new Map<string, { teamName: string; mpOfficialRating?: number }>();
   let page = 1;
 
   while (true) {
@@ -81,7 +81,8 @@ export async function getClassTeams(
       const team = t as Record<string, unknown>;
       const teamUrl = team.teamLink as string | undefined;
       const name = (team.schoolName as string) ?? "";
-      if (teamUrl) seen.set(urlToSlug(teamUrl), name);
+      const mpOfficialRating = typeof team.rating === "number" ? (team.rating as number) : undefined;
+      if (teamUrl) seen.set(urlToSlug(teamUrl), { teamName: name, mpOfficialRating });
     }
 
     if (teams.length === 0 || seen.size >= totalCount) break;
@@ -89,7 +90,7 @@ export async function getClassTeams(
   }
 
   console.log(`Found ${seen.size} teams in class rankings`);
-  return [...seen.entries()].map(([slug, teamName]) => ({ slug, teamName }));
+  return [...seen.entries()].map(([slug, v]) => ({ slug, ...v }));
 }
 
 export async function getSchedule(

@@ -483,7 +483,7 @@
 <body>
   <header>
     <h1>UHSAA Boys Soccer RPI Rankings</h1>
-    <span class="subtitle">RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)</span>
+    <span class="subtitle" id="subtitle">RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)</span>
     <select id="year-select" class="year-select" onchange="setYear(this.value)">
       <option value="live">2025-26 (Live)</option>
       <option value="2025">2024-25</option>
@@ -507,7 +507,7 @@
     let OUR_SLUG = null;
     let allData = {};
     let activeFilter = "4A";
-    let sortCol = "rpi";
+    let sortCol = "mpRating";
     let sortDir = "desc";
     let activeYear = "live";
     let historicalPayload = null;
@@ -518,12 +518,22 @@
       return slug.includes(school.toLowerCase().replace(/\s+/g, "-"));
     }
 
+    function primaryCol(filter) {
+      return filter === "4A" ? "mpRating" : "rpi";
+    }
+
     function setFilter(f) {
       activeFilter = f;
+      sortCol = primaryCol(f);
+      sortDir = "desc";
       document.getElementById("btn-4a").classList.toggle("active", f === "4A");
       document.getElementById("btn-5a").classList.toggle("active", f === "5A");
       document.getElementById("btn-6a").classList.toggle("active", f === "6A");
       document.getElementById("btn-all").classList.toggle("active", f === "all");
+      const sub = document.getElementById("subtitle");
+      if (sub) sub.textContent = f === "4A"
+        ? "4A uses MaxPreps Rating  ·  5A/6A use RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)"
+        : "RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)";
       if (activeYear === "live") buildUI(allData);
       else if (historicalPayload) buildHistoricalUI(historicalPayload);
     }
@@ -589,23 +599,40 @@
     function buildUI(data) {
       allData = data;
 
-      // Assign RPI ranks within the active filter
-      const allByRpi = Object.values(data).sort((a, b) => b.rpi - a.rpi);
-      const filtered = allByRpi.filter(t => activeFilter === "all" || t.classification === activeFilter);
-      filtered.forEach((t, i) => { t._rpiRank = i + 1; });
+      const pCol = primaryCol(activeFilter);
+
+      // Rank within the active filter by primary metric
+      const allByPrimary = Object.values(data).sort((a, b) => {
+        const va = pCol === "mpRating" ? (a.mpRating ?? -999) : a.rpi;
+        const vb = pCol === "mpRating" ? (b.mpRating ?? -999) : b.rpi;
+        return vb - va;
+      });
+      const filtered = allByPrimary.filter(t => activeFilter === "all" || t.classification === activeFilter);
+      filtered.forEach((t, i) => { t._rank = i + 1; });
 
       // Sort by active column
       const teams = [...filtered];
       teams.sort((a, b) => {
-        const val = { rpi: t => t.rpi, gpg: t => t.gpg, gapg: t => t.gapg, gd: t => t.gd };
         if (sortCol === "team") {
           const na = (a.teamName ?? a.team).toLowerCase();
           const nb = (b.teamName ?? b.team).toLowerCase();
           return sortDir === "desc" ? nb.localeCompare(na) : na.localeCompare(nb);
         }
-        const fn = val[sortCol] ?? val.rpi;
-        return sortDir === "desc" ? fn(b) - fn(a) : fn(a) - fn(b);
+        const val = (t) => {
+          if (sortCol === "mpRating") return t.mpRating ?? -999;
+          if (sortCol === "rpi") return t.rpi;
+          if (sortCol === "gpg") return t.gpg;
+          if (sortCol === "gapg") return t.gapg;
+          if (sortCol === "gd") return t.gd;
+          return t[pCol] ?? t.rpi;
+        };
+        return sortDir === "desc" ? val(b) - val(a) : val(a) - val(b);
       });
+
+      const primaryLabel = pCol === "mpRating" ? "Rating" : "RPI";
+      const primaryFmt = pCol === "mpRating"
+        ? (t) => fmt2(t.mpRating ?? 0)
+        : (t) => fmt4(t.rpi);
 
       document.getElementById("body").innerHTML = `
         <div class="list-panel">
@@ -619,8 +646,8 @@
                   onclick="setSort('gapg')">GAPG${sortArrow("gapg")}</span>
             <span class="sortable${sortCol === "gd" ? " sort-active" : ""}"
                   onclick="setSort('gd')">GD/G${sortArrow("gd")}</span>
-            <span class="sortable${sortCol === "rpi" ? " sort-active" : ""}"
-                  onclick="setSort('rpi')">RPI${sortArrow("rpi")}</span>
+            <span class="sortable${sortCol === pCol ? " sort-active" : ""}"
+                  onclick="setSort('${pCol}')">${primaryLabel}${sortArrow(pCol)}</span>
           </div>
           <div class="list-scroll" id="list-scroll"></div>
         </div>
@@ -638,12 +665,12 @@
         row.innerHTML = `
           <span class="stat-cell" style="color:var(--muted);font-size:0.65rem">${i + 1}</span>
           <span class="team-name" title="${esc(team.teamName)}">
-            <span class="rank-badge">#${team._rpiRank}</span>${esc(team.teamName)}<span class="record-inline">(${esc(team.record)})</span><span class="class-pill">${esc(team.classification)}</span>
+            <span class="rank-badge">#${team._rank}</span>${esc(team.teamName)}<span class="record-inline">(${esc(team.record)})</span><span class="class-pill">${esc(team.classification)}</span>
           </span>
           <span class="stat-cell">${fmt2(team.gpg)}</span>
           <span class="stat-cell">${fmt2(team.gapg)}</span>
           <span class="stat-cell">${fmtGd(team.gd)}</span>
-          <span class="rpi-pill">${fmt4(team.rpi)}</span>
+          <span class="rpi-pill">${primaryFmt(team)}</span>
         `;
         row.addEventListener("click", () => selectTeam(team));
         listEl.appendChild(row);
@@ -657,6 +684,11 @@
       } else if (teams.length) {
         selectTeam(teams[0]);
       }
+
+      const sub = document.getElementById("subtitle");
+      if (sub) sub.textContent = activeFilter === "4A"
+        ? "4A uses MaxPreps Rating  ·  5A/6A use RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)"
+        : "RPI = 0.45(MWP) + 0.45(OWP) + 0.10(OOWP)";
     }
 
     function buildHistoricalUI(payload) {
@@ -838,25 +870,40 @@
 
     function renderDetail(team) {
       const isOurs = team.team === OUR_SLUG;
-      document.getElementById("detail-panel").innerHTML = `
-        <div class="detail-card">
-          <div class="card-head">
-            <div class="title">${esc(team.teamName)}</div>
-            <div class="meta-row">
-              <span class="badge badge-class">${esc(team.classification)}</span>
-              <span class="record">${esc(team.record)}</span>
-              <span class="badge badge-rank">Rank #${team._rpiRank ?? "—"}</span>
-              ${isOurs ? '<span class="badge badge-ours">Our Team</span>' : ""}
-              <a class="maxpreps-link" href="${esc(maxPrepsUrl(team.team))}"
-                 target="_blank" rel="noopener">MaxPreps &rarr;</a>
-            </div>
-          </div>
+      const is4A = team.classification === "4A";
+      const hasOfficial = typeof team.mpOfficialRating === "number";
 
+      const heroSection = is4A ? `
+          <div class="rpi-hero">
+            <span class="rpi-big">${fmt2(team.mpRating ?? 0)}</span>
+            <span class="rpi-label">Rating${hasOfficial ? ` · Official: ${fmt2(team.mpOfficialRating)}` : " (est.)"}</span>
+          </div>` : `
           <div class="rpi-hero">
             <span class="rpi-big">${fmt4(team.rpi)}</span>
             <span class="rpi-label">RPI</span>
-          </div>
+          </div>`;
 
+      const rpiSection = is4A ? `
+          <div class="section">
+            <div class="section-title">RPI (5A/6A metric for reference)</div>
+            <div class="component-grid">
+              <div class="component-cell">
+                <div class="cc-label">MWP</div>
+                <div class="cc-val">${fmt4(team.mwp)}</div>
+                <div class="cc-weight">45% weight</div>
+              </div>
+              <div class="component-cell">
+                <div class="cc-label">OWP</div>
+                <div class="cc-val">${fmt4(team.owp)}</div>
+                <div class="cc-weight">45% weight</div>
+              </div>
+              <div class="component-cell">
+                <div class="cc-label">OOWP</div>
+                <div class="cc-val">${fmt4(team.oowp)}</div>
+                <div class="cc-weight">10% weight</div>
+              </div>
+            </div>
+          </div>` : `
           <div class="section">
             <div class="section-title">Component Breakdown</div>
             <div class="component-grid">
@@ -876,7 +923,24 @@
                 <div class="cc-weight">10% weight</div>
               </div>
             </div>
+          </div>`;
+
+      document.getElementById("detail-panel").innerHTML = `
+        <div class="detail-card">
+          <div class="card-head">
+            <div class="title">${esc(team.teamName)}</div>
+            <div class="meta-row">
+              <span class="badge badge-class">${esc(team.classification)}</span>
+              <span class="record">${esc(team.record)}</span>
+              <span class="badge badge-rank">Rank #${team._rank ?? "—"}</span>
+              ${isOurs ? '<span class="badge badge-ours">Our Team</span>' : ""}
+              <a class="maxpreps-link" href="${esc(maxPrepsUrl(team.team))}"
+                 target="_blank" rel="noopener">MaxPreps &rarr;</a>
+            </div>
           </div>
+
+          ${heroSection}
+          ${rpiSection}
 
           <div class="section">
             <div class="section-title">Scoring</div>

@@ -1,5 +1,5 @@
 import { getBuildId, getClassTeams, getSchedule, fetchBatch } from "../src/maxpreps";
-import { calculateRpi } from "../src/rpi";
+import { calculateRpi, calculateAllMaxPrepsRatings } from "../src/rpi";
 import type { KVPayload, RpiResult, TeamSchedule } from "../src/types";
 import { writeFileSync, readFileSync, existsSync } from "fs";
 
@@ -76,6 +76,7 @@ async function main() {
   // Fetch all class teams (4A + 5A + 6A)
   // SLUG_LIST_FILE overrides rankings pages (useful when historical rankings 404)
   const classTeamMap = new Map<string, string>(); // slug → teamName
+  const officialRatings: Record<string, number> = {};
   const slugListFile = process.env.SLUG_LIST_FILE;
   if (slugListFile) {
     const slugs: string[] = JSON.parse(readFileSync(slugListFile, "utf8"));
@@ -85,7 +86,10 @@ async function main() {
     for (const { cls, divisionId } of CLASS_CONFIGS) {
       const rankingsSlug = `ut/soccer/${SEASON}/class/class-${cls}a/rankings`;
       const teams = await getClassTeams(rankingsSlug, divisionId, buildId);
-      for (const { slug, teamName } of teams) classTeamMap.set(slug, teamName);
+      for (const { slug, teamName, mpOfficialRating } of teams) {
+        classTeamMap.set(slug, teamName);
+        if (mpOfficialRating !== undefined) officialRatings[slug] = mpOfficialRating;
+      }
       console.log(`Found ${teams.length} ${cls}A teams`);
     }
   }
@@ -128,12 +132,18 @@ async function main() {
   const freshL3 = await fetchBatch(staleL3, buildId, SEASON!);
   Object.assign(scheduleCache, freshL3);
 
+  // Compute MaxPreps-style ratings for all teams in the schedule cache
+  const mpRatings = calculateAllMaxPrepsRatings(scheduleCache);
+  console.log(`Computed MaxPreps ratings for ${Object.keys(mpRatings).length} teams`);
+
   const results: Record<string, RpiResult> = {};
 
   // Our team
   const myResult = calculateRpi(TEAM_SLUG!, myClass, scheduleCache);
+  myResult.mpRating = Math.round((mpRatings[TEAM_SLUG!] ?? 0) * 100) / 100;
+  if (officialRatings[TEAM_SLUG!] !== undefined) myResult.mpOfficialRating = officialRatings[TEAM_SLUG!];
   results[TEAM_SLUG!] = myResult;
-  console.log(`RPI ${TEAM_SLUG}: ${myResult.rpi} (MWP=${myResult.mwp}, OWP=${myResult.owp}, OOWP=${myResult.oowp})`);
+  console.log(`RPI ${TEAM_SLUG}: ${myResult.rpi} | Rating: ${myResult.mpRating}`);
 
   // All target teams
   for (const slug of allTargetSlugs) {
@@ -141,8 +151,9 @@ async function main() {
     if (!team) continue;
     try {
       const r = calculateRpi(slug, team.classification, scheduleCache);
+      r.mpRating = Math.round((mpRatings[slug] ?? 0) * 100) / 100;
+      if (officialRatings[slug] !== undefined) r.mpOfficialRating = officialRatings[slug];
       results[slug] = r;
-      console.log(`RPI ${slug}: ${r.rpi}`);
     } catch (e) {
       console.warn(`Could not calculate RPI for ${slug}: ${e}`);
     }

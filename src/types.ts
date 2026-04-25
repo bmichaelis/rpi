@@ -26,6 +26,8 @@ export interface RpiResult {
   owp: number;
   oowp: number;
   rpi: number;
+  mpRating?: number;         // our computed MaxPreps-style rating (iterative)
+  mpOfficialRating?: number; // official MaxPreps rating from rankings page
   gpg: number;
   gapg: number;
   gd: number;
