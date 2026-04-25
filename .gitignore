@@ -6,3 +6,6 @@ rpi_result.json
 *.pyc
 __pycache__/
 .env
+.superpowers/
+verify-results.json
+verify-schedule-cache.json
