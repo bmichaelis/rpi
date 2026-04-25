@@ -1,0 +1,118 @@
+<h2>Proposed rankings table layout</h2>
+<p class="subtitle">New GPG / GAPG columns, sortable headers, RPI rank badge pinned to the team name. Does this structure look right?</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Rankings Table — sorted by RPI (default)</div>
+    <div class="mockup-body">
+      <style>
+        .rpi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .rpi-table th { padding: 6px 10px; text-align: left; background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e2e8f0; cursor: pointer; user-select: none; white-space: nowrap; }
+        .rpi-table th.sorted { color: #2563eb; background: #eff6ff; }
+        .rpi-table th .sort-arrow { margin-left: 4px; color: #2563eb; }
+        .rpi-table td { padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
+        .rpi-table tr:hover td { background: #f8fafc; }
+        .rpi-table tr.our-team td { background: #fef9c3; }
+        .rpi-rank-badge { display: inline-block; background: #3b82f6; color: white; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 1px 6px; margin-right: 6px; }
+        .rpi-val { font-family: ui-monospace, monospace; font-weight: 600; }
+        .stat-val { font-family: ui-monospace, monospace; color: #374151; }
+        .record-muted { color: #9ca3af; font-size: 12px; }
+        .class-badge { display: inline-block; background: #dbeafe; color: #1e40af; border-radius: 3px; font-size: 10px; font-weight: 600; padding: 0px 4px; margin-left: 4px; vertical-align: middle; }
+      </style>
+      <table class="rpi-table">
+        <thead>
+          <tr>
+            <th class="sorted">RPI ▾</th>
+            <th>Team</th>
+            <th>W-L</th>
+            <th>GPG</th>
+            <th>GAPG</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="our-team">
+            <td><span class="rpi-val">0.6812</span></td>
+            <td><span class="rpi-rank-badge">#1</span>Ridgeline <span class="class-badge">4A</span></td>
+            <td class="record-muted">12-0</td>
+            <td class="stat-val">4.58</td>
+            <td class="stat-val">0.33</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6425</span></td>
+            <td><span class="rpi-rank-badge">#2</span>Timpanogos <span class="class-badge">4A</span></td>
+            <td class="record-muted">9-1</td>
+            <td class="stat-val">3.10</td>
+            <td class="stat-val">0.80</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6201</span></td>
+            <td><span class="rpi-rank-badge">#3</span>Orem Tigers <span class="class-badge">4A</span></td>
+            <td class="record-muted">8-2</td>
+            <td class="stat-val">2.80</td>
+            <td class="stat-val">0.90</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.5897</span></td>
+            <td><span class="rpi-rank-badge">#4</span>Mountain Crest <span class="class-badge">4A</span></td>
+            <td class="record-muted">7-3</td>
+            <td class="stat-val">2.20</td>
+            <td class="stat-val">1.10</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mockup" style="margin-top: 16px;">
+    <div class="mockup-header">Same table — sorted by GPG (RPI rank badge stays visible)</div>
+    <div class="mockup-body">
+      <table class="rpi-table">
+        <thead>
+          <tr>
+            <th>RPI</th>
+            <th>Team</th>
+            <th>W-L</th>
+            <th class="sorted">GPG ▾</th>
+            <th>GAPG</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="our-team">
+            <td><span class="rpi-val">0.6812</span></td>
+            <td><span class="rpi-rank-badge">#1</span>Ridgeline <span class="class-badge">4A</span></td>
+            <td class="record-muted">12-0</td>
+            <td class="stat-val">4.58</td>
+            <td class="stat-val">0.33</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6201</span></td>
+            <td><span class="rpi-rank-badge">#3</span>Orem Tigers <span class="class-badge">4A</span></td>
+            <td class="record-muted">8-2</td>
+            <td class="stat-val">2.80</td>
+            <td class="stat-val">0.90</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6425</span></td>
+            <td><span class="rpi-rank-badge">#2</span>Timpanogos <span class="class-badge">4A</span></td>
+            <td class="record-muted">9-1</td>
+            <td class="stat-val">3.10</td>
+            <td class="stat-val">0.80</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.5897</span></td>
+            <td><span class="rpi-rank-badge">#4</span>Mountain Crest <span class="class-badge">4A</span></td>
+            <td class="record-muted">7-3</td>
+            <td class="stat-val">2.20</td>
+            <td class="stat-val">1.10</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <p style="font-size:13px; color:#6b7280;">
+    <strong>Key behaviors:</strong> Clicking any column header sorts by that stat (toggle asc/desc). The <span style="background:#3b82f6;color:white;border-radius:4px;font-size:11px;font-weight:700;padding:1px 5px;">#N</span> RPI rank badge always stays next to the team name regardless of sort. W-L column included since it's useful context alongside GPG/GAPG.
+  </p>
+</div>

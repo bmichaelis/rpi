@@ -1,0 +1,6 @@
+{"type":"server-started","port":58002,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:58002","screen_dir":"/Users/brett/brett-dev/rpi/.superpowers/brainstorm/stable-1776793767/content","state_dir":"/Users/brett/brett-dev/rpi/.superpowers/brainstorm/stable-1776793767/state"}
+{"type":"screen-added","file":"/Users/brett/brett-dev/rpi/.superpowers/brainstorm/stable-1776793767/content/table-layout.html"}
+{"type":"screen-added","file":"/Users/brett/brett-dev/rpi/.superpowers/brainstorm/stable-1776793767/content/table-layout-v2.html"}
+{"type":"screen-added","file":"/Users/brett/brett-dev/rpi/.superpowers/brainstorm/stable-1776793767/content/detail-layout.html"}
+{"type":"screen-added","file":"/Users/brett/brett-dev/rpi/.superpowers/brainstorm/stable-1776793767/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -1,0 +1,131 @@
+<h2>Updated table layout</h2>
+<p class="subtitle">W-L in parens after team name. Two options: with or without Goal Differential (GD).</p>
+
+<style>
+  .rpi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rpi-table th { padding: 6px 10px; text-align: left; background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e2e8f0; cursor: pointer; user-select: none; white-space: nowrap; }
+  .rpi-table th.sorted { color: #2563eb; background: #eff6ff; }
+  .rpi-table td { padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
+  .rpi-table tr:hover td { background: #f8fafc; }
+  .rpi-table tr.our-team td { background: #fef9c3; }
+  .rpi-rank-badge { display: inline-block; background: #3b82f6; color: white; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 1px 6px; margin-right: 5px; }
+  .rpi-val { font-family: ui-monospace, monospace; font-weight: 600; }
+  .stat-val { font-family: ui-monospace, monospace; color: #374151; }
+  .stat-pos { font-family: ui-monospace, monospace; color: #16a34a; font-weight: 600; }
+  .record-inline { color: #9ca3af; font-size: 12px; }
+  .class-badge { display: inline-block; background: #dbeafe; color: #1e40af; border-radius: 3px; font-size: 10px; font-weight: 600; padding: 0px 4px; margin-left: 3px; vertical-align: middle; }
+</style>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Option A — GPG + GAPG only (no GD column)</div>
+    <div class="mockup-body">
+      <table class="rpi-table">
+        <thead>
+          <tr>
+            <th class="sorted">RPI ▾</th>
+            <th>Team</th>
+            <th>GPG</th>
+            <th>GAPG</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="our-team">
+            <td><span class="rpi-val">0.6812</span></td>
+            <td><span class="rpi-rank-badge">#1</span>Ridgeline <span class="record-inline">(12-0)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">4.58</td>
+            <td class="stat-val">0.33</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6425</span></td>
+            <td><span class="rpi-rank-badge">#2</span>Timpanogos <span class="record-inline">(9-1)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">3.10</td>
+            <td class="stat-val">0.80</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6201</span></td>
+            <td><span class="rpi-rank-badge">#3</span>Orem Tigers <span class="record-inline">(8-2)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">2.80</td>
+            <td class="stat-val">0.90</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.5897</span></td>
+            <td><span class="rpi-rank-badge">#4</span>Mountain Crest <span class="record-inline">(7-3)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">2.20</td>
+            <td class="stat-val">1.10</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mockup" style="margin-top: 16px;">
+    <div class="mockup-header">Option B — GPG + GAPG + GD (goal differential per game, sortable)</div>
+    <div class="mockup-body">
+      <table class="rpi-table">
+        <thead>
+          <tr>
+            <th class="sorted">RPI ▾</th>
+            <th>Team</th>
+            <th>GPG</th>
+            <th>GAPG</th>
+            <th>GD/G</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="our-team">
+            <td><span class="rpi-val">0.6812</span></td>
+            <td><span class="rpi-rank-badge">#1</span>Ridgeline <span class="record-inline">(12-0)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">4.58</td>
+            <td class="stat-val">0.33</td>
+            <td class="stat-pos">+4.25</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6425</span></td>
+            <td><span class="rpi-rank-badge">#2</span>Timpanogos <span class="record-inline">(9-1)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">3.10</td>
+            <td class="stat-val">0.80</td>
+            <td class="stat-pos">+2.30</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.6201</span></td>
+            <td><span class="rpi-rank-badge">#3</span>Orem Tigers <span class="record-inline">(8-2)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">2.80</td>
+            <td class="stat-val">0.90</td>
+            <td class="stat-pos">+1.90</td>
+          </tr>
+          <tr>
+            <td><span class="rpi-val">0.5897</span></td>
+            <td><span class="rpi-rank-badge">#4</span>Mountain Crest <span class="record-inline">(7-3)</span> <span class="class-badge">4A</span></td>
+            <td class="stat-val">2.20</td>
+            <td class="stat-val">1.10</td>
+            <td class="stat-pos">+1.10</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <p style="font-size:13px; color:#6b7280; margin-top: 8px;">
+    <strong>GD/G</strong> = (goals scored − goals allowed) ÷ games played. Shown in <span style="color:#16a34a;font-weight:600;">green</span> when positive. All three columns (GPG, GAPG, GD/G) are sortable. RPI rank badge stays with the team name.
+  </p>
+</div>
+
+<div class="options" style="margin-top:8px;">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>GPG + GAPG only</h3>
+      <p>Simpler table, 4 columns total</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>GPG + GAPG + GD/G</h3>
+      <p>Full picture, 5 columns total — my recommendation</p>
+    </div>
+  </div>
+</div>
