@@ -169,17 +169,37 @@ export function calculateRpi(
   };
 }
 
-// MaxPreps-style iterative rating: rating = 1.18*(W-L) + 0.93*avg_opponent_rating
-// Converges because the contraction factor (0.93) is < 1.
-// Fitted to Utah Boys Soccer 4A/5A/6A data (R²=0.9876 vs official MaxPreps ratings).
+// MaxPreps-style rating using OLS formula fitted to Utah Boys Soccer 4A/5A/6A data.
+// For teams with known strength (avg opponent published rating): uses direct OLS formula
+//   rating = 0.8809*(W-L) + 0.9183*strength + 1.6813*gdCap + 0.0552
+//   R²=0.9886, MAE=0.746 vs official MaxPreps ratings.
+// Falls back to iterative for teams without a known strength value.
 export function calculateAllMaxPrepsRatings(
   allSchedules: Record<string, TeamSchedule>,
+  strengthMap: Record<string, number> = {},
   iterations = 50
 ): Record<string, number> {
   const slugs = Object.keys(allSchedules);
   const ratings: Record<string, number> = {};
 
+  // First pass: OLS formula for teams with known strength
   for (const slug of slugs) {
+    const sched = allSchedules[slug];
+    const strength = strengthMap[slug];
+    if (strength !== undefined) {
+      const W = sched.games.filter(g => g.won === true).length;
+      const L = sched.games.filter(g => g.won === false).length;
+      const scoredGames = sched.games.filter(g => g.goalsScored !== null && g.goalsAllowed !== null);
+      const gdCap = scoredGames.length > 0
+        ? scoredGames.reduce((s, g) => s + Math.max(-3, Math.min(3, (g.goalsScored ?? 0) - (g.goalsAllowed ?? 0))), 0) / scoredGames.length
+        : 0;
+      ratings[slug] = 0.8809 * (W - L) + 0.9183 * strength + 1.6813 * gdCap + 0.0552;
+    }
+  }
+
+  // Iterative formula for remaining teams (no known strength)
+  const iterSlugs = slugs.filter(s => ratings[s] === undefined);
+  for (const slug of iterSlugs) {
     const sched = allSchedules[slug];
     const W = sched.games.filter(g => g.won === true).length;
     const L = sched.games.filter(g => g.won === false).length;
@@ -188,7 +208,7 @@ export function calculateAllMaxPrepsRatings(
 
   for (let iter = 0; iter < iterations; iter++) {
     const prev = { ...ratings };
-    for (const slug of slugs) {
+    for (const slug of iterSlugs) {
       const sched = allSchedules[slug];
       const W = sched.games.filter(g => g.won === true).length;
       const L = sched.games.filter(g => g.won === false).length;

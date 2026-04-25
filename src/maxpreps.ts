@@ -56,8 +56,8 @@ export async function getClassTeams(
   rankingsSlug: string,
   stateDivisionId: string,
   buildId: string
-): Promise<Array<{ slug: string; teamName: string; mpOfficialRating?: number }>> {
-  const seen = new Map<string, { teamName: string; mpOfficialRating?: number }>();
+): Promise<Array<{ slug: string; teamName: string; mpOfficialRating?: number; mpStrength?: number }>> {
+  const seen = new Map<string, { teamName: string; mpOfficialRating?: number; mpStrength?: number }>();
   let page = 1;
 
   while (true) {
@@ -82,7 +82,8 @@ export async function getClassTeams(
       const teamUrl = team.teamLink as string | undefined;
       const name = (team.schoolName as string) ?? "";
       const mpOfficialRating = typeof team.rating === "number" ? (team.rating as number) : undefined;
-      if (teamUrl) seen.set(urlToSlug(teamUrl), { teamName: name, mpOfficialRating });
+      const mpStrength = typeof team.strength === "number" ? (team.strength as number) : undefined;
+      if (teamUrl) seen.set(urlToSlug(teamUrl), { teamName: name, mpOfficialRating, mpStrength });
     }
 
     if (teams.length === 0 || seen.size >= totalCount) break;

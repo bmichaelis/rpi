@@ -77,6 +77,7 @@ async function main() {
   // SLUG_LIST_FILE overrides rankings pages (useful when historical rankings 404)
   const classTeamMap = new Map<string, string>(); // slug → teamName
   const officialRatings: Record<string, number> = {};
+  const strengthMap: Record<string, number> = {};
   const slugListFile = process.env.SLUG_LIST_FILE;
   if (slugListFile) {
     const slugs: string[] = JSON.parse(readFileSync(slugListFile, "utf8"));
@@ -86,9 +87,10 @@ async function main() {
     for (const { cls, divisionId } of CLASS_CONFIGS) {
       const rankingsSlug = `ut/soccer/${SEASON}/class/class-${cls}a/rankings`;
       const teams = await getClassTeams(rankingsSlug, divisionId, buildId);
-      for (const { slug, teamName, mpOfficialRating } of teams) {
+      for (const { slug, teamName, mpOfficialRating, mpStrength } of teams) {
         classTeamMap.set(slug, teamName);
         if (mpOfficialRating !== undefined) officialRatings[slug] = mpOfficialRating;
+        if (mpStrength !== undefined) strengthMap[slug] = mpStrength;
       }
       console.log(`Found ${teams.length} ${cls}A teams`);
     }
@@ -133,8 +135,8 @@ async function main() {
   Object.assign(scheduleCache, freshL3);
 
   // Compute MaxPreps-style ratings for all teams in the schedule cache
-  const mpRatings = calculateAllMaxPrepsRatings(scheduleCache);
-  console.log(`Computed MaxPreps ratings for ${Object.keys(mpRatings).length} teams`);
+  const mpRatings = calculateAllMaxPrepsRatings(scheduleCache, strengthMap);
+  console.log(`Computed MaxPreps ratings for ${Object.keys(mpRatings).length} teams (${Object.keys(strengthMap).length} using OLS formula)`);
 
   const results: Record<string, RpiResult> = {};
 
