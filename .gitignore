@@ -7,5 +7,6 @@ rpi_result.json
 __pycache__/
 .env
 .superpowers/
+.worktrees/
 verify-results.json
 verify-schedule-cache.json
