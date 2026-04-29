@@ -1,5 +1,18 @@
 # MaxPreps Rating Reproduction — Design
 
+## Status
+
+- [x] Phase 1: Eval harness on `main` (this commit chain)
+- [ ] Phase 2: Worktree A — Refined OLS (Plan 2 — to be written)
+- [ ] Phase 3: Worktree B — Massey iteration (Plan 3 — to be written)
+- [ ] Phase 4: Worktree C — Residual reverse-engineering (Plan 4 — to be written)
+- [ ] Phase 5: Compare results, merge winner (Plan 5 — to be written)
+
+Baseline (current OLS) — see `scripts/eval/BASELINE.md`:
+- Utah-2026 (training): MAE=0.93, MaxErr=2.67, R²=0.986
+- Texas-2026 (held-out): MAE=4.39, MaxErr=17.36, R²=-0.62
+- Acceptance bar for new approaches: MAE < 4.19 on Texas held-out
+
 ## Background
 
 We currently compute a MaxPreps-style rating via an OLS formula:
