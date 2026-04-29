@@ -5,7 +5,12 @@
   "scripts": {
     "typecheck": "tsc",
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev"
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "fetch-snapshot": "tsx scripts/eval/fetch-snapshot.ts",
+    "score": "tsx scripts/eval/score-cli.ts",
+    "baseline": "tsx scripts/eval/baseline.ts"
   },
   "dependencies": {
     "node-html-parser": "^7.1.0"
@@ -14,6 +19,7 @@
     "@cloudflare/workers-types": "^4.20260402.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
+    "vitest": "^2.1.9",
     "wrangler": "^4.80.0"
   }
 }
