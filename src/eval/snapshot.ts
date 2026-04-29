@@ -3,8 +3,9 @@ import type { TeamSchedule } from "../types";
 import type { Snapshot } from "./types";
 
 export interface ClassTarget {
-  rankingsSlug: string;     // e.g. "ut/soccer/spring-2026/class/class-4a/rankings"
-  stateDivisionId: string;  // MaxPreps division UUID
+  rankingsSlug: string;     // e.g. "ut/soccer/spring/25-26/class/class-4a/rankings"
+  stateDivisionId: string;  // MaxPreps division UUID, "" for state-wide rankings
+  maxPages?: number;        // cap pagination (state-wide rankings can be huge)
 }
 
 export interface BuildSnapshotArgs {
@@ -20,8 +21,8 @@ export async function buildSnapshot(args: BuildSnapshotArgs): Promise<Snapshot> 
   const strengthMap: Record<string, number> = {};
   const classTeamMap = new Map<string, string>();
 
-  for (const { rankingsSlug, stateDivisionId } of args.classes) {
-    const teams = await getClassTeams(rankingsSlug, stateDivisionId, buildId);
+  for (const { rankingsSlug, stateDivisionId, maxPages } of args.classes) {
+    const teams = await getClassTeams(rankingsSlug, stateDivisionId, buildId, maxPages);
     for (const { slug, teamName, mpOfficialRating, mpStrength } of teams) {
       classTeamMap.set(slug, teamName);
       if (mpOfficialRating !== undefined) officialRatings[slug] = mpOfficialRating;

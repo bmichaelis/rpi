@@ -27,7 +27,22 @@ const PRESETS: Record<string, SnapshotConfig> = {
       },
     ],
   },
-  // texas-2026 added in Task 10 once division IDs are discovered
+  "texas-2026": {
+    // Texas boys soccer is winter season (Dec-Apr); MaxPreps's path slug uses
+    // `winter/25-26` for the rankings list and `winter` for team schedules.
+    // Texas does not subdivide its boys-soccer rankings by class on MaxPreps —
+    // we use the state-wide list and cap pagination at 4 pages (~100 ranked
+    // teams) to keep the held-out set comparable in size to Utah training.
+    source: "texas-statewide-2026",
+    season: "winter",
+    classes: [
+      {
+        rankingsSlug: "tx/soccer/winter/25-26/rankings",
+        stateDivisionId: "",
+        maxPages: 4,
+      },
+    ],
+  },
 };
 
 function parseArgs(argv: string[]): { preset?: string; out?: string } {

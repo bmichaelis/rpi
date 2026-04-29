@@ -55,13 +55,15 @@ export async function getBuildId(): Promise<string> {
 export async function getClassTeams(
   rankingsSlug: string,
   stateDivisionId: string,
-  buildId: string
+  buildId: string,
+  maxPages?: number
 ): Promise<Array<{ slug: string; teamName: string; mpOfficialRating?: number; mpStrength?: number }>> {
   const seen = new Map<string, { teamName: string; mpOfficialRating?: number; mpStrength?: number }>();
   let page = 1;
 
   while (true) {
-    const url = `${BASE_URL}/_next/data/${buildId}/${rankingsSlug}/${page}.json?statedivisionid=${stateDivisionId}`;
+    const query = stateDivisionId ? `?statedivisionid=${stateDivisionId}` : "";
+    const url = `${BASE_URL}/_next/data/${buildId}/${rankingsSlug}/${page}.json${query}`;
     let pageProps: Record<string, unknown>;
     try {
       const res = await fetch(url, { headers: HEADERS });
@@ -87,6 +89,7 @@ export async function getClassTeams(
     }
 
     if (teams.length === 0 || seen.size >= totalCount) break;
+    if (maxPages !== undefined && page >= maxPages) break;
     page++;
   }
 
