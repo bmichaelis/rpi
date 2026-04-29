@@ -4,6 +4,7 @@ export interface Game {
   won: boolean | null; // null = tie
   goalsScored: number | null;  // ourTeam[6], null if unplayed
   goalsAllowed: number | null; // oppTeam[6], null if unplayed
+  isPlayoff: boolean;
 }
 
 export interface TeamSchedule {
