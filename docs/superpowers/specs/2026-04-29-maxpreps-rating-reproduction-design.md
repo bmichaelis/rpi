@@ -79,11 +79,14 @@ Snapshot file shape:
 ```typescript
 {
   capturedAt: string;          // ISO timestamp
+  source: string;              // provenance tag, e.g. "utah-4a5a6a-2026"
   scheduleCache: Record<string, TeamSchedule>;  // includes playoff games
   officialRatings: Record<string, number>;      // slug → MaxPreps rating
   strengthMap: Record<string, number>;          // slug → MaxPreps strength
 }
 ```
+
+Note: `scripts/` is not included in `npm run typecheck` (only `src/`). Worktrees A/B/C should run `tsc --noEmit` directly on any new scripts, or add `scripts/**/*.ts` to `tsconfig.json` after installing `@types/node`.
 
 `fetch-snapshot.ts` is a one-off script. Snapshots are JSON files committed to git. Approaches read them, never re-fetch.
 
