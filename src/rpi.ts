@@ -77,7 +77,7 @@ export function calculateRpi(
 ): RpiResult {
   const mySchedule = allSchedules[mySlug];
   if (!mySchedule) throw new Error(`No schedule found for ${mySlug}`);
-  const l1Games = mySchedule.games;
+  const l1Games = mySchedule.games.filter((g) => !g.isPlayoff);
 
   const wins = l1Games.filter((g) => g.won === true).length;
   const losses = l1Games.filter((g) => g.won === false).length;
@@ -102,7 +102,7 @@ export function calculateRpi(
   for (const game of l1Games) {
     const opp = allSchedules[game.opponentSlug];
     if (!opp) continue;
-    oppWps.push(calcWp(opp.games, mySlug));
+    oppWps.push(calcWp(opp.games.filter((g) => !g.isPlayoff), mySlug));
   }
   const owp = oppWps.length > 0 ? oppWps.reduce((a, b) => a + b, 0) / oppWps.length : 0;
 
@@ -113,11 +113,11 @@ export function calculateRpi(
     const opp = allSchedules[oppSlug];
     if (!opp) continue;
     const ooWps: number[] = [];
-    for (const oppGame of opp.games) {
+    for (const oppGame of opp.games.filter((g) => !g.isPlayoff)) {
       if (oppGame.opponentSlug === mySlug) continue;
       const oo = allSchedules[oppGame.opponentSlug];
       if (!oo) continue;
-      ooWps.push(calcWp(oo.games, oppSlug, mySlug));
+      ooWps.push(calcWp(oo.games.filter((g) => !g.isPlayoff), oppSlug, mySlug));
     }
     if (ooWps.length > 0) {
       oowpPerOpp.push(ooWps.reduce((a, b) => a + b, 0) / ooWps.length);
@@ -142,7 +142,7 @@ export function calculateRpi(
   for (const oppSlug of uniqueOppSlugs) {
     const opp = allSchedules[oppSlug];
     if (!opp) continue;
-    for (const g of opp.games) {
+    for (const g of opp.games.filter((g) => !g.isPlayoff)) {
       if (g.opponentSlug !== mySlug && !uniqueOppSlugs.includes(g.opponentSlug)) {
         oppOppSlugs.add(g.opponentSlug);
       }

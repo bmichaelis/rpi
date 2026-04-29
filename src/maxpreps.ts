@@ -129,7 +129,9 @@ export async function getSchedule(
       const team2 = game[1] as unknown[];
       if (!team1 || !team2) continue;
       if (team1[C_DELETED] || team2[C_DELETED]) continue;
-      if ((team1[C_GAME_TYPE] as number) === 4 || (team2[C_GAME_TYPE] as number) === 4) continue;
+      const isPlayoff =
+        (team1[C_GAME_TYPE] as number) === 4 ||
+        (team2[C_GAME_TYPE] as number) === 4;
 
       const slug1 = urlToSlug((team1[C_URL] as string) ?? "");
       const slug2 = urlToSlug((team2[C_URL] as string) ?? "");
@@ -170,7 +172,7 @@ export async function getSchedule(
       const goalsAllowed = typeof oppTeam[C_SCORE] === "number"
         ? (oppTeam[C_SCORE] as number)
         : null;
-      games.push({ opponentSlug, opponentName, won, goalsScored, goalsAllowed });
+      games.push({ opponentSlug, opponentName, won, goalsScored, goalsAllowed, isPlayoff });
     }
   }
 
