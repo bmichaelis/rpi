@@ -11,18 +11,18 @@ interface SnapshotConfig {
 const PRESETS: Record<string, SnapshotConfig> = {
   "utah-2026": {
     source: "utah-4a5a6a-2026",
-    season: "spring-2026",
+    season: "spring/25-26",
     classes: [
       {
-        rankingsSlug: "ut/soccer/spring-2026/class/class-4a/rankings",
+        rankingsSlug: "ut/soccer/spring/25-26/class/class-4a/rankings",
         stateDivisionId: "c534b3e8-c200-4b4b-9aa6-f5aa1e5352bc",
       },
       {
-        rankingsSlug: "ut/soccer/spring-2026/class/class-5a/rankings",
+        rankingsSlug: "ut/soccer/spring/25-26/class/class-5a/rankings",
         stateDivisionId: "feaf72b1-8c0d-4a89-b835-a75c292d2347",
       },
       {
-        rankingsSlug: "ut/soccer/spring-2026/class/class-6a/rankings",
+        rankingsSlug: "ut/soccer/spring/25-26/class/class-6a/rankings",
         stateDivisionId: "0f72a3d1-ec2e-46f5-8a1a-6f4b6df56ca7",
       },
     ],
