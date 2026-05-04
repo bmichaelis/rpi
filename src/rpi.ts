@@ -169,11 +169,31 @@ export function calculateRpi(
   };
 }
 
-// MaxPreps-style rating using OLS formula fitted to Utah Boys Soccer 4A/5A/6A data.
-// For teams with known strength (avg opponent published rating): uses direct OLS formula
-//   rating = 0.8809*(W-L) + 0.9183*strength + 1.6813*gdCap + 0.0552
-//   R²=0.9886, MAE=0.746 vs official MaxPreps ratings.
-// Falls back to iterative for teams without a known strength value.
+// MaxPreps-style rating, fitted on Utah 4A/5A/6A 2026 data and validated on
+// Texas state-wide held-out (winter 25-26).
+//
+// Formula:
+//   rating = 0.0810
+//          + 0.1383 * (W - L)
+//          + 0.9152 * strength
+//          + 1.3587 * gdCap
+//          + 11.1414 * (W - L) / nGames
+//
+// where:
+//   W, L     = wins, losses (played games)
+//   nGames   = number of played games
+//   gdCap    = mean per-game goal differential capped at ±3
+//   strength = MaxPreps's published `strength` field (avg opponent rating)
+//
+// Accuracy (see scripts/eval/BASELINE.md and the residual/ branch RESULT.md):
+//   Utah-2026 (training):  MAE=0.7275, MaxErr=2.09, R²=0.9895
+//   Texas-2026 (held-out): MAE=1.5993, MaxErr=8.14, R²=0.6171
+//
+// The (W-L)/nGames term was the breakthrough — it normalises win-loss by
+// season length, fixing the long-season over-prediction that plagued the
+// previous formula on out-of-state data.
+//
+// Falls back to a simple iterative rating for teams without a known strength.
 export function calculateAllMaxPrepsRatings(
   allSchedules: Record<string, TeamSchedule>,
   strengthMap: Record<string, number> = {},
@@ -182,18 +202,24 @@ export function calculateAllMaxPrepsRatings(
   const slugs = Object.keys(allSchedules);
   const ratings: Record<string, number> = {};
 
-  // First pass: OLS formula for teams with known strength
   for (const slug of slugs) {
     const sched = allSchedules[slug];
     const strength = strengthMap[slug];
     if (strength !== undefined) {
-      const W = sched.games.filter(g => g.won === true).length;
-      const L = sched.games.filter(g => g.won === false).length;
-      const scoredGames = sched.games.filter(g => g.goalsScored !== null && g.goalsAllowed !== null);
-      const gdCap = scoredGames.length > 0
-        ? scoredGames.reduce((s, g) => s + Math.max(-3, Math.min(3, (g.goalsScored ?? 0) - (g.goalsAllowed ?? 0))), 0) / scoredGames.length
+      const played = sched.games.filter(g => g.goalsScored !== null && g.goalsAllowed !== null);
+      const W = played.filter(g => g.won === true).length;
+      const L = played.filter(g => g.won === false).length;
+      const n = played.length;
+      const gdCap = n > 0
+        ? played.reduce((s, g) => s + Math.max(-3, Math.min(3, (g.goalsScored ?? 0) - (g.goalsAllowed ?? 0))), 0) / n
         : 0;
-      ratings[slug] = 0.8809 * (W - L) + 0.9183 * strength + 1.6813 * gdCap + 0.0552;
+      const wlNorm = n > 0 ? (W - L) / n : 0;
+      ratings[slug] =
+        0.0810 +
+        0.1383 * (W - L) +
+        0.9152 * strength +
+        1.3587 * gdCap +
+        11.1414 * wlNorm;
     }
   }
 

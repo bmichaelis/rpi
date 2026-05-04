@@ -1,65 +1,67 @@
-# Baseline — current OLS formula
+# Baseline — current production formula
 
-`rating = 0.8809*(W-L) + 0.9183*strength + 1.6813*gdCap + 0.0552`
+`rating = 0.0810 + 0.1383*(W-L) + 0.9152*strength + 1.3587*gdCap + 11.1414*(W-L)/nGames`
 
-Captured: 2026-04-29T21:36:07.694Z
+Captured: 2026-05-04T23:00:53.566Z
+
+(Previous formula: `0.8809*(W-L) + 0.9183*strength + 1.6813*gdCap + 0.0552` — Utah MAE 0.93, Texas MAE 4.39, Texas R² −0.62. Replaced 2026-05-04 by the residual reverse-engineering experiment.)
 
 ## Training set: utah-2026
 
 - n: 77
-- MAE: 0.9293
-- RMSE: 1.0430
-- MaxErr: 2.6675
-- R²: 0.9855
+- MAE: 0.7278
+- RMSE: 0.8848
+- MaxErr: 2.0907
+- R²: 0.9895
 
 By class:
-- 4A: n=29, MAE=0.9886, MaxErr=2.6675
-- 5A: n=30, MAE=1.0945, MaxErr=2.0982
-- 6A: n=18, MAE=0.5584, MaxErr=1.4659
+- 4A: n=29, MAE=0.7377, MaxErr=1.5265
+- 5A: n=30, MAE=0.9708, MaxErr=2.0907
+- 6A: n=18, MAE=0.3068, MaxErr=1.2465
 
 Worst 10:
 | slug | predicted | official | residual |
 |------|-----------|----------|----------|
-| ut/hurricane/hurricane-tigers | -11.5775 | -8.9100 | -2.6675 |
-| ut/clearfield/clearfield-falcons | -5.9318 | -8.0300 | 2.0982 |
-| ut/sandy/alta-hawks | 17.1145 | 19.1900 | -2.0755 |
-| ut/lehi/lehi-pioneers | -6.6259 | -5.1600 | -1.4659 |
-| ut/park-city/park-city-miners | 6.6049 | 5.1500 | 1.4549 |
-| ut/hyrum/mountain-crest-mustangs | 5.3893 | 6.8100 | -1.4207 |
-| ut/roy/roy-royals | -11.0186 | -9.6500 | -1.3686 |
-| ut/spanish-fork/spanish-fork-dons | -2.6822 | -1.3200 | -1.3622 |
-| ut/washington/crimson-cliffs-mustangs | 9.6937 | 8.3500 | 1.3437 |
-| ut/springville/springville-red-devils | -9.0201 | -7.6800 | -1.3401 |
+| ut/west-jordan/west-jordan-jaguars | -12.4293 | -14.5200 | 2.0907 |
+| ut/sandy/alta-hawks | 17.2144 | 19.1900 | -1.9756 |
+| ut/clearfield/clearfield-falcons | -6.4394 | -8.0300 | 1.5906 |
+| ut/park-city/park-city-miners | 6.6765 | 5.1500 | 1.5265 |
+| ut/hyrum/mountain-crest-mustangs | 5.3368 | 6.8100 | -1.4732 |
+| ut/salt-lake-city/west-panthers | -6.6685 | -8.1400 | 1.4715 |
+| ut/salt-lake-city/highland-rams | -0.2581 | -1.7000 | 1.4419 |
+| ut/smithfield/sky-view-bobcats | 7.7601 | 9.1600 | -1.3999 |
+| ut/midvale/hillcrest-huskies | 3.8782 | 5.2300 | -1.3518 |
+| ut/salt-lake-city/brighton-bengals | 6.6208 | 7.9700 | -1.3492 |
 
 ## Held-out set: texas-2026
 
 - n: 100
-- MAE: 4.3937
-- RMSE: 5.0755
-- MaxErr: 17.3553
-- R²: -0.6192
+- MAE: 1.5980
+- RMSE: 2.4666
+- MaxErr: 8.1350
+- R²: 0.6176
 
 By class:
-- 4A: n=9, MAE=5.3694, MaxErr=10.4572
-- 5A: n=26, MAE=4.9434, MaxErr=8.6875
-- 6A: n=54, MAE=3.8260, MaxErr=8.0617
-- OOS: n=11, MAE=5.0830, MaxErr=17.3553
+- 4A: n=9, MAE=2.1870, MaxErr=7.2749
+- 5A: n=26, MAE=1.4758, MaxErr=7.2915
+- 6A: n=54, MAE=1.2792, MaxErr=7.9695
+- OOS: n=11, MAE=2.9706, MaxErr=8.1350
 
 Worst 10:
 | slug | predicted | official | residual |
 |------|-----------|----------|----------|
-| tx/neches/neches-tigers | 35.3453 | 17.9900 | 17.3553 |
-| tx/brookshire/royal-falcons | 28.7072 | 18.2500 | 10.4572 |
-| tx/bellaire/episcopal-knights | 17.8966 | 27.5500 | -9.6534 |
-| tx/salado/salado-eagles | 25.0476 | 16.2500 | 8.7976 |
-| tx/frisco/wakeland-wolverines | 33.3475 | 24.6600 | 8.6875 |
-| tx/el-paso/coronado-thunderbirds | 24.5717 | 16.5100 | 8.0617 |
-| tx/prosper/walnut-grove-wildcats | 39.1289 | 31.3300 | 7.7989 |
-| tx/edinburg/economedes-jaguars | 21.7966 | 14.2900 | 7.5066 |
-| tx/jacksonville/jacksonville-fightin-indians | 23.7613 | 16.5500 | 7.2113 |
-| tx/palestine/palestine-wildcats | 23.6745 | 16.5100 | 7.1645 |
+| tx/bellaire/episcopal-knights | 19.4150 | 27.5500 | -8.1350 |
+| tx/the-woodlands/college-park-cavaliers | 23.1605 | 31.1300 | -7.9695 |
+| tx/dallas/adams-cougars | 11.6685 | 18.9600 | -7.2915 |
+| tx/bridgeport/bridgeport-bulls | 16.2651 | 23.5400 | -7.2749 |
+| tx/san-antonio/pieper-warriors | 20.1970 | 26.5200 | -6.3230 |
+| tx/irving/cistercian-hawks | 12.6317 | 18.9300 | -6.2983 |
+| tx/houston/klein-cain-hurricanes | 21.3319 | 27.6300 | -6.2981 |
+| tx/waco/la-vega-pirates | 16.8203 | 22.5400 | -5.7197 |
+| tx/san-antonio/san-antonio-christian-lions | 15.5615 | 20.6600 | -5.0985 |
+| tx/prosper/walnut-grove-wildcats | 26.5712 | 31.3300 | -4.7588 |
 
 ## Acceptance bar for new approaches
 
 A new formula must beat this baseline by **≥ 0.20 MAE on the texas-2026 held-out set**.
-Current bar: MAE < 4.1937.
+Current bar: MAE < 1.3980.

@@ -45,11 +45,13 @@ async function main() {
 
   writeFileSync(
     "scripts/eval/BASELINE.md",
-    `# Baseline — current OLS formula
+    `# Baseline — current production formula
 
-\`rating = 0.8809*(W-L) + 0.9183*strength + 1.6813*gdCap + 0.0552\`
+\`rating = 0.0810 + 0.1383*(W-L) + 0.9152*strength + 1.3587*gdCap + 11.1414*(W-L)/nGames\`
 
 Captured: ${new Date().toISOString()}
+
+(Previous formula: \`0.8809*(W-L) + 0.9183*strength + 1.6813*gdCap + 0.0552\` — Utah MAE 0.93, Texas MAE 4.39, Texas R² −0.62. Replaced 2026-05-04 by the residual reverse-engineering experiment.)
 
 ## Training set: utah-2026
 

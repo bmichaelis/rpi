@@ -142,7 +142,7 @@ async function main() {
 
   // Our team
   const myResult = calculateRpi(TEAM_SLUG!, myClass, scheduleCache);
-  myResult.mpRating = Math.round((mpRatings[TEAM_SLUG!] ?? 0) * 100) / 100;
+  myResult.mpRating = Math.round((mpRatings[TEAM_SLUG!] ?? 0) * 10000) / 10000;
   if (officialRatings[TEAM_SLUG!] !== undefined) myResult.mpOfficialRating = officialRatings[TEAM_SLUG!];
   results[TEAM_SLUG!] = myResult;
   console.log(`RPI ${TEAM_SLUG}: ${myResult.rpi} | Rating: ${myResult.mpRating}`);
@@ -153,7 +153,7 @@ async function main() {
     if (!team) continue;
     try {
       const r = calculateRpi(slug, team.classification, scheduleCache);
-      r.mpRating = Math.round((mpRatings[slug] ?? 0) * 100) / 100;
+      r.mpRating = Math.round((mpRatings[slug] ?? 0) * 10000) / 10000;
       if (officialRatings[slug] !== undefined) r.mpOfficialRating = officialRatings[slug];
       results[slug] = r;
     } catch (e) {
