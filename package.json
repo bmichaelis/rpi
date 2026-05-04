@@ -10,7 +10,9 @@
     "test:watch": "vitest",
     "fetch-snapshot": "tsx scripts/eval/fetch-snapshot.ts",
     "score": "tsx scripts/eval/score-cli.ts",
-    "baseline": "tsx scripts/eval/baseline.ts"
+    "baseline": "tsx scripts/eval/baseline.ts",
+    "fit:v1": "tsx scripts/eval/fit-v1.ts",
+    "predict:v1": "tsx scripts/eval/predict-v1.ts"
   },
   "dependencies": {
     "node-html-parser": "^7.1.0"
